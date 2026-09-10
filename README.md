@@ -1,4 +1,4 @@
-# ⚙️ Sincronizador Automático de Inventario (Python & GCP)
+#  Sincronizador Automático de Inventario (Python & GCP)
 
 Pipeline autónomo diseñado para auditar, sincronizar y respaldar el inventario físico de una tienda local con su plataforma e-commerce (WooCommerce), eliminando el error humano y optimizando las operaciones comerciales.
 
