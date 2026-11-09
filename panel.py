@@ -93,7 +93,7 @@ def pedir_opcion_vivo(prompt):
             return ""
 
 def menu():
-    os.system("pgrep -f 'marcha_rapida_delta.py$' > /dev/null 2>&1 || (nohup python3 ~/marcha_rapida_delta.py >/dev/null 2>&1 &)")
+    os.system("pgrep -f 'vigia_github.py' > /dev/null 2>&1 || (nohup python3 ~/vigia_github.py >/dev/null 2>&1 &)"); os.system("pgrep -f 'marcha_rapida_delta.py$' > /dev/null 2>&1 || (nohup python3 ~/marcha_rapida_delta.py >/dev/null 2>&1 &)")
     c, msg = cargar(), ""
     while True:
         os.system("clear")
