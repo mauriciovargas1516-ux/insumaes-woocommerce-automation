@@ -128,10 +128,11 @@ def menu():
         print(" [18] 📡 RADAR EN VIVO PANTALLA COMPLETA | Muestra hasta 30 impactos en tiempo real + Filtros")
         print(" [19] 🔫 PISTOLA BARRAS & VENTAS MELI    | Descuenta ventas por interno (Pistola) o desde ML")
         print(" [20] 🚀🛑 MONITOR ACTIVADOS Y AGOTADOS   | Muestra qué se activó (0->Stock) y qué se agotó (0 uds)")
+        print(" [21] 🐙 SINCRONIZAR CÓDIGO CON GITHUB  | Sube tus mejoras a GitHub o descarga cambios en 1 clic")
         print("==========================================================================================")
         print(" [0] Salir (Todo se guarda solo al presionar cada número)")
         if msg: print(f"\n💡 {msg}"); msg = ""
-        op = pedir_opcion_vivo("\n👉 Opción (0-20): ")
+        op = pedir_opcion_vivo("\n👉 Opción (0-21): ")
         if op == "0": guardar(c); break
         elif op == "6": msg = "🔒 MELI_PRECIOS está BLOQUEADO por seguridad."
         elif op in ("1", "2", "3", "4"):
@@ -201,6 +202,8 @@ def menu():
             import pistola_pos; pistola_pos.abrir_pistola()
         elif op == "20":
             import monitor_detenidas; monitor_detenidas.abrir_monitor_detenidas()
+        elif op == "21":
+            os.system("cd ~ && git add .gitignore *.py *.sh && git commit -m 'Auto-Sync desde Panel ERP' 2>/dev/null; git pull --rebase origin main 2>/dev/null; git push origin main"); input("\n✅ Código sincronizado con tu GitHub (mauriciovargas1516-ux). Enter para volver...")
         elif op == "15":
             print("\n📧 Enviando reporte completo a tu Gmail..."); os.system("python3 ~/enviar_correo.py --forzar"); input("\nEnter para volver...")
         elif op == "14":
