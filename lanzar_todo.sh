@@ -1,4 +1,5 @@
 #!/bin/bash
+cd /home/mauriciovargas1516 && git pull --rebase origin main >/dev/null 2>&1
 
 INICIO=$(date +%s)
 echo "Empezó a las: $(date)"
