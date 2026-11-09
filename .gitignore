@@ -16,3 +16,17 @@ meli_api_items_full.json
 respaldo_meli_original.json
 .*
 !.gitignore
+*.pfx
+*.db
+*.csv
+*.bak
+*.respaldo
+*.out
+*.bat
+(PASO*
+BACKUPS_ANTIGUOS/
+respaldo_insumaes/
+config_bot.json
+diccionario_ean_insumaes.json
+estado_antispam.json
+ultimos_editados.json
