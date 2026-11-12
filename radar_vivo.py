@@ -53,7 +53,7 @@ def abrir_radar_completo():
         print(f"📡 RADAR VERTICAL A PANTALLA COMPLETA [{ft}] ({mf} filas) | 💓 {ev} | HOY: 🛒Woo:{cw} | 💛Meli:{cm} | 🛑Pausas:{cp} | 🔫POS:{cpos}")
         print("=" * W)
         for idx, (f, t, cod, nom, det, dc, a, b, est) in enumerate(vs[off:off + mf], start=off + 1):
-            hr = f[11:19] if len(f) >= 19 else f
+            hr = f"{f[:5]} {f[11:19]}" if len(f) >= 19 else f
             tm_m = re.search(r"\[(\d+\.\d+s)\]", det); ts = f"⏱️ {tm_m.group(1)}" if tm_m else "⏱️ ~0.35s"
             tag = "🛍️💛 [VENTA-ML] " if "VENTA" in t else ("🔫🛒 [POS-WOO]  " if "POS-WOO" in t else ("🔫💛 [POS-MELI] " if "POS-MELI" in t else ("🛒 [WOOCOMMERCE]" if "WOO" in t else "💛 [MERCADOLIBRE]")))
             ico = "🛑⚠️(0)" if est=="AGOTADO" else ("🚀✨ACT" if est=="ACTIVADO" else (f"🟢⬆️(+{b-a})" if est=="SUBIO" else (f"🔴⬇️({b-a})" if est=="BAJO" else "💰PRECIO")))
@@ -75,7 +75,7 @@ def abrir_radar_completo():
                 print(f"📜 MODO CASCADA VERTICAL [{ft}] — Usa la rueda del mouse para subir y bajar libremente (Últimos 500 impactos):")
                 print("=" * W)
                 for idx, (f, t, cod, nom, det, dc, a, b, est) in enumerate(vs[:500], start=1):
-                    hr = f[11:19] if len(f) >= 19 else f
+                    hr = f"{f[:5]} {f[11:19]}" if len(f) >= 19 else f
                     tm_m = re.search(r"\[(\d+\.\d+s)\]", det); ts = f"⏱️ {tm_m.group(1)}" if tm_m else "⏱️ ~0.35s"
                     tag = "🛒 [WOOCOMMERCE]" if "WOO" in t else "💛 [MERCADOLIBRE]"
                     ico = "🛑⚠️(0)" if est=="AGOTADO" else ("🚀✨ACT" if est=="ACTIVADO" else (f"🟢⬆️(+{b-a})" if est=="SUBIO" else (f"🔴⬇️({b-a})" if est=="BAJO" else "💰PRECIO")))

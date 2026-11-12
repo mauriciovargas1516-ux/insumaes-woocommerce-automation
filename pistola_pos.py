@@ -26,7 +26,7 @@ def abrir_pistola():
         for l in list(reversed(todas))[:7]:
             m = re.match(r"^\[(.*?)\]\s*\[(.*?)\]\s*(.*?)\s*\|\s*(.*?)\s*\|\s*(.*)$", l)
             if m:
-                f, t, cod, nom, det = m.groups(); hr = f[11:19]
+                f, t, cod, nom, det = m.groups(); hr = f"{f[:5]} {f[11:19]}" if len(f) >= 19 else f
                 tm_m = re.search(r"\[(\d+\.\d+s)\]", det); ts = f"⏱️ {tm_m.group(1)}" if tm_m else "⏱️ ~0.35s"
                 dc = re.sub(r"\s*\[\d+\.\d+s\]", "", det).replace("->", "➔").strip()
                 tag = "🛍️💛 [VENTA-ML] " if "VENTA" in t else ("🔫🛒 [POS-WOO]  " if "POS-WOO" in t else ("🔫💛 [POS-MELI] " if "POS-MELI" in t else ("🛒 [WOOCOMMERCE]" if "WOO" in t else "💛 [MERCADOLIBRE]")))

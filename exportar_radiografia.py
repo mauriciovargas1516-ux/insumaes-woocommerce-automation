@@ -1,55 +1,72 @@
-import os, glob, time, dropbox, pandas as pd
+import os, glob, time, json, zipfile, dropbox
 
 os.environ["TZ"] = "America/Santiago"
 try: time.tzset()
 except Exception: pass
 
-APP_KEY = dict(l.strip().replace('"', '').split('=', 1) for l in open('/home/mauriciovargas1516/.env') if '=' in l)['DROPBOX_APP_KEY']
-APP_SECRET = dict(l.strip().replace('"', '').split('=', 1) for l in open('/home/mauriciovargas1516/.env') if '=' in l)['DROPBOX_APP_SECRET']
-REFRESH_TOKEN = dict(l.strip().replace('"', '').split('=', 1) for l in open('/home/mauriciovargas1516/.env') if '=' in l)['DROPBOX_REFRESH_TOKEN']
+def conectar_dbx():
+    env = dict(l.strip().replace('"', '').split('=', 1) for l in open(os.path.expanduser('~/.env')) if '=' in l and not l.strip().startswith('#'))
+    return dropbox.Dropbox(app_key=env["DROPBOX_APP_KEY"], app_secret=env["DROPBOX_APP_SECRET"], oauth2_refresh_token=env["DROPBOX_REFRESH_TOKEN"])
 
-def generar_y_subir():
-    print("\n📄 Empaquetando todos los scripts .py, .sh, configuraciones y logs en RADIOGRAFIA_ERP_INSUMAES.txt...")
-    dbx = dropbox.Dropbox(app_key=APP_KEY, app_secret=APP_SECRET, oauth2_refresh_token=REFRESH_TOKEN)
-    partes = [
-        "==========================================================================",
-        f"RADIOGRAFIA COMPLETA ERP INSUMAES - {time.strftime('%Y-%m-%d %H:%M:%S')} (Hora Chile)",
-        "==========================================================================\n"
-    ]
-    for fn_x in ("~/AUDITORIA_PRE_SYNC.xlsx", "~/AUDITORIA_MELI_INSUMAES.xlsx"):
-        px = os.path.expanduser(fn_x)
-        if os.path.exists(px):
-            try:
-                dfx = pd.read_excel(px)
-                partes.append(f"Columnas {os.path.basename(px)}: {list(dfx.columns)}")
-                fx = dfx[dfx.astype(str).apply(lambda x: x.str.contains("SOLUBLE", case=False, na=False)).any(axis=1)]
-                partes.append(f"Filas SOLUBLE en {os.path.basename(px)}:\n" + fx.to_string() + "\n")
-            except Exception as ex:
-                partes.append(f"Error leyendo {fn_x}: {ex}\n")
-
+def ejecutar_rescate_total():
+    t0 = time.time()
     home = os.path.expanduser("~")
-    for ruta in sorted(glob.glob(f"{home}/*.py") + glob.glob(f"{home}/*.sh") + glob.glob(f"{home}/*.json")):
+    dbx = conectar_dbx()
+    ahora = time.strftime("%Y-%m-%d %H:%M:%S")
+    fecha_hoy = time.strftime("%Y-%m-%d")
+
+    print("\n" + "=" * 92)
+    print(f"🛡️  AUDITORÍA Y RESCATE TOTAL DE LA NUBE (.PY, .SH, .JSON, .LOG, .DB) — {ahora}")
+    print("=" * 92)
+
+    patrones = ["*.py", "*.sh", "*.log", "config_bot.json", "estado_stocks_delta.json", "mapas_rapidos_cache.json"]
+    archivos_txt = []
+    for pat in patrones:
+        for f in sorted(glob.glob(os.path.join(home, pat))):
+            nom_f = os.path.basename(f)
+            if os.path.isfile(f) and not nom_f.startswith("fix_") and not nom_f.startswith("upgrade_"):
+                archivos_txt.append(f)
+
+    bloques = [
+        "=" * 80,
+        f"RADIOGRAFIA COMPLETA ERP INSUMAES CLOUD - GENERADO: {ahora}",
+        f"Total Archivos Incluidos: {len(archivos_txt)}",
+        "=" * 80 + "\n"
+    ]
+    for ruta in archivos_txt:
         nom = os.path.basename(ruta)
-        if "token" in nom.lower(): continue
+        tam = os.path.getsize(ruta)
         try:
-            c = open(ruta, "r", encoding="utf-8", errors="replace").read()
-            partes.append(f"\n\n{'#'*80}\n### ARCHIVO: {nom} ({len(c)} bytes)\n{'#'*80}\n{c}")
+            contenido = open(ruta, "r", encoding="utf-8", errors="replace").read()
+            if nom.endswith(".log") and len(contenido) > 35000:
+                contenido = "... [TRUNCADO A ÚLTIMOS 35 KB] ...\n" + contenido[-35000:]
         except Exception as e:
-            partes.append(f"\n### ERROR {nom}: {e}")
+            contenido = f"[Error leyendo {nom}: {e}]"
+        bloques.append(f"{'#' * 80}\n### ARCHIVO: {nom} ({tam} bytes)\n{'#' * 80}\n{contenido}\n\n")
+        print(f"  📄 [RESCATADO EN TXT] {nom:<38} ({tam:>8,} bytes)")
 
-    for lg in ("delta.log", "historial_erp.log", "cron_registro.log"):
-        pl = os.path.join(home, lg)
-        if os.path.exists(pl):
-            ls = open(pl, "r", encoding="utf-8", errors="replace").readlines()[-60:]
-            partes.append(f"\n\n{'='*80}\n=== ÚLTIMAS 60 LÍNEAS DE {lg} ===\n{'='*80}\n" + "".join(ls))
-
-    txt_final = "\n".join(partes)
-    ruta_local = os.path.expanduser("~/RADIOGRAFIA_ERP_INSUMAES.txt")
-    open(ruta_local, "w", encoding="utf-8").write(txt_final)
+    txt_final = "".join(bloques)
+    ruta_rad_local = os.path.join(home, "RADIOGRAFIA_ERP_INSUMAES.txt")
+    open(ruta_rad_local, "w", encoding="utf-8").write(txt_final)
     dbx.files_upload(txt_final.encode("utf-8"), "/RADIOGRAFIA_ERP_INSUMAES.txt", mode=dropbox.files.WriteMode.overwrite)
-    try: dbx.files_delete_v2("/Compras L-Angel/RADIOGRAFIA_ERP_INSUMAES.txt")
-    except Exception: pass
-    print("✅ ¡RADIOGRAFIA_ERP_INSUMAES.txt subido a la RAÍZ de tu Dropbox (junto a tus .zip)!")
+    print(f"\n  ✅ 1/2: '/RADIOGRAFIA_ERP_INSUMAES.txt' actualizado en tu Dropbox ({len(txt_final)//1024:,} KB).")
+
+    nom_zip = f"BACKUP_ERP_INSUMAES_{fecha_hoy}.zip"
+    ruta_zip_local = os.path.join(home, nom_zip)
+    exts_zip = (".py", ".sh", ".json", ".log", ".db")
+    cont_zip = 0
+    with zipfile.ZipFile(ruta_zip_local, "w", zipfile.ZIP_DEFLATED) as zf:
+        for item in sorted(os.listdir(home)):
+            r_full = os.path.join(home, item)
+            if os.path.isfile(r_full) and item.endswith(exts_zip) and not item.startswith("fix_"):
+                zf.write(r_full, arcname=item)
+                cont_zip += 1
+
+    tam_zip = os.path.getsize(ruta_zip_local)
+    with open(ruta_zip_local, "rb") as fz:
+        dbx.files_upload(fz.read(), f"/{nom_zip}", mode=dropbox.files.WriteMode.overwrite)
+    print(f"  ✅ 2/2: '/{nom_zip}' subido a tu Dropbox ({cont_zip} archivos | {tam_zip//1024:,} KB) en {time.time()-t0:.1f}s.")
+    print("=" * 92 + "\n")
 
 if __name__ == "__main__":
-    generar_y_subir()
+    ejecutar_rescate_total()

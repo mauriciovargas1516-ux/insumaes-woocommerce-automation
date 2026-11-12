@@ -62,7 +62,7 @@ def mostrar_radar_hud():
         m = re.match(r"^\[(.*?)\]\s*\[(.*?)\]\s*(.*?)\s*\|\s*(.*?)\s*\|\s*(.*)$", l)
         if m:
             f, t, cod, nom, det = m.groups()
-            hr = f[11:19] if len(f) >= 19 else f
+            hr = f"{f[:5]} {f[11:19]}" if len(f) >= 19 else f
             tm_m = re.search(r"\[(\d+\.\d+s)\]", det)
             ts = f"⏱️ {tm_m.group(1)}" if tm_m else "⏱️ ~0.4s"
             dc = re.sub(r"Stock\s+(\d+)\s*➔\s*(\d+)\s*uds", r"\1 uds ➔ \2 uds", re.sub(r"\s*\|\s*Precio\s*\$(\d+)\s*➔\s*\$\1\b", "", re.sub(r"\s*\[\d+\.\d+s\]", "", det).replace("->", "➔"))).strip()
@@ -129,10 +129,13 @@ def menu():
         print(" [19] 🔫 PISTOLA BARRAS & VENTAS MELI    | Descuenta ventas por interno (Pistola) o desde ML")
         print(" [20] 🚀🛑 MONITOR ACTIVADOS Y AGOTADOS   | Muestra qué se activó (0->Stock) y qué se agotó (0 uds)")
         print(" [21] 🐙 SINCRONIZAR CÓDIGO CON GITHUB  | Sube tus mejoras a GitHub o descarga cambios en 1 clic")
+        print(" [22] 🛠️ SUITE CLOUD WOO (HTML & LOTES) | Editor Lote HTML, Mapa Categorías y Respaldo HTML Web")
+        print(" [23] 🏢 CRM NACIONAL & COTIZACIONES B2B| Unifica 204 Libros de Clientes, Cotizaciones y Plantilla")
+        print(" [24] 📖 MANUAL E INSTRUCCIONES (AYUDA) | Guía interactiva de los 24 botones + Portada README GitHub")
         print("==========================================================================================")
         print(" [0] Salir (Todo se guarda solo al presionar cada número)")
         if msg: print(f"\n💡 {msg}"); msg = ""
-        op = pedir_opcion_vivo("\n👉 Opción (0-21): ")
+        op = pedir_opcion_vivo("\n👉 Opción (0-24): ")
         if op == "0": guardar(c); break
         elif op == "6": msg = "🔒 MELI_PRECIOS está BLOQUEADO por seguridad."
         elif op in ("1", "2", "3", "4"):
@@ -202,6 +205,12 @@ def menu():
             import pistola_pos; pistola_pos.abrir_pistola()
         elif op == "20":
             import monitor_detenidas; monitor_detenidas.abrir_monitor_detenidas()
+        elif op == "22":
+            import suite_cloud_woo; suite_cloud_woo.abrir_suite()
+        elif op == "23":
+            import centro_cotizaciones; centro_cotizaciones.abrir_centro_cotizaciones()
+        elif op == "24":
+            import manual_cloud; manual_cloud.abrir_manual()
         elif op == "21":
             os.system("cd ~ && git add .gitignore *.py *.sh && git commit -m 'Auto-Sync desde Panel ERP' 2>/dev/null; git pull --rebase origin main 2>/dev/null; git push origin main"); input("\n✅ Código sincronizado con tu GitHub (mauriciovargas1516-ux). Enter para volver...")
         elif op == "15":

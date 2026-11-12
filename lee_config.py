@@ -13,7 +13,7 @@ def fmt_bitacora(l, num=None):
     pref = f"   {num:02d}. " if num is not None else "   • "
     if not m: return pref + l.strip()
     f, t, cod, nom, det = m.groups()
-    hr = f[11:19] if len(f) >= 19 else f
+    hr = f"{f[:5]} {f[11:19]}" if len(f) >= 19 else f
     tm = re.search(r"\[(\d+\.\d+s)\]", det)
     ts = f" | ⏱️ {tm.group(1)}" if tm else ""
     dc = re.sub(r"Stock\s+(\d+)\s*(?:->|➔)\s*(\d+)\s*uds", r"\1 uds -> \2 uds", re.sub(r"\s*\|\s*Precio\s*\$(\d+)\s*(?:->|➔)\s*\$\1\b", "", re.sub(r"\s*\[\d+\.\d+s\]", "", det))).strip()
