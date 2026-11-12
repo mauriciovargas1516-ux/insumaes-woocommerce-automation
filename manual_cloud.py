@@ -4,30 +4,7 @@ os.environ["TZ"] = "America/Santiago"
 try: time.tzset()
 except Exception: pass
 
-TABLA_COMPARATIVA_MD = "\n".join([
-    "## 1. Impacto Operativo y Ahorro de Tiempo (Trabajo Manual vs. Arquitectura Cloud)",
-    "",
-    "El sistema transforma procesos manuales repetitivos en operaciones automatizadas por lote en Google Cloud, logrando una **reducción del 95,3% en el tiempo operativo mensual** (**52,5 horas ahorradas al mes** / **630,0 horas al año**, equivalentes a **75,0 jornadas laborales completas** de 8,4 horas):",
-    "",
-    "| Proceso Operativo / Comercial | Volumen Activo | Tiempo Haciéndolo a Mano | Tiempo con Máquina Cloud | Ahorro Mensual | Ahorro Anual |",
-    "| :--- | :--- | :--- | :--- | :---: | :---: |",
-    "| **1. Sincronización Stock y Precios (Woo + ML)** | 2.509 ítems (550 cambios/mes) | 2,5 min por cambio (23,8 hrs/mes) | 0,35 seg por cambio (0,9 hrs/mes) | **22,9 hrs** | **274,8 hrs** |",
-    "| **2. Emisión y Cruce de Cotizaciones B2B** | 141 cotizaciones/mes (445 en SQL) | 8,0 min por cotización (18,8 hrs/mes) | 0,5 min por cotización (1,2 hrs/mes) | **17,6 hrs** | **211,2 hrs** |",
-    "| **3. Estandarización HTML/CSS y Auto-Linker ISO** | 752 fichas técnicas vinculadas | 3,5 min por ficha (43,9 hrs por lote) | 4,0 min el lote completo (0,2 hrs/mes) | **7,3 hrs** | **87,6 hrs** |",
-    "| **4. Estandarización de Fotos (800x720) y Categorías** | 1.727 productos (100 ajustes/mes) | 3,0 min por imagen (5,0 hrs/mes) | 0,2 min por imagen (0,3 hrs/mes) | **4,7 hrs** | **56,4 hrs** |",
-    "| **TOTAL OPERACIÓN CONTINUA** | **2.509 publicaciones + CRM B2B** | **55,1 hrs / mes** | **2,6 hrs / mes** | **52,5 hrs / mes** | **630,0 hrs / año** |",
-    "",
-    "### Velocidad de Ejecución en Tareas Masivas Puntuales (Lotes Complejos)",
-    "",
-    "| Tarea Masiva de Catálogo o Inteligencia Comercial | Haciéndolo a Mano | Con este Sistema Cloud | Reducción de Tiempo |",
-    "| :--- | :---: | :---: | :---: |",
-    "| **Conectar botones de venta cruzada en 752 productos web** | 43,9 horas (5,2 días) | **4,0 minutos** | **99,8%** |",
-    "| **Unificar ~204 Libros de Clientes por Ciudad + Cuentas por Cobrar** | 18,0 horas (2,1 días) | **1,8 minutos** | **99,8%** |",
-    "| **Buscar el historial, RUT y cotizaciones de un cliente en 204 ciudades** | 15,0 minutos | **0,01 segundos (SQL)** | **99,9%** |",
-    "| **Preparar y estructurar las 1.727 fichas para 1 nuevo Marketplace** | 172,7 horas (20,6 días) | **30,0 minutos (0,5 hrs)** | **99,7%** |",
-    "| **Expandir el catálogo completo a 3 nuevos Marketplaces (Falabella, Paris, Lider)** | 518,1 horas (61,7 días) | **1,5 horas** | **99,7%** |",
-    ""
-])
+TABLA_COMPARATIVA_MD = '## 1. Impacto Operativo y Porcentaje de Mejora (Trabajo Manual vs. Arquitectura Cloud)\n\nEl sistema transforma procesos manuales repetitivos en operaciones automatizadas por lote en Google Cloud, logrando una **mejora de eficiencia del 95,3%** (**21,2 veces más rápido**), con **52,5 horas ahorradas al mes** y **630,0 horas ahorradas al año** (equivalentes a **75,0 jornadas laborales completas** de 8,4 horas):\n\n| Proceso Operativo / Comercial | Volumen Activo | Tiempo Manual | Tiempo Cloud | Ahorro / Mes | Ahorro / Año | % Mejora (Velocidad) |\n| :--- | :--- | :---: | :---: | :---: | :---: | :---: |\n| **1. Sincronización Stock y Precios (Woo + ML)** | 2.509 ítems (550 cambios/mes) | 23,8 hrs/mes | 0,9 hrs/mes | **22,9 hrs** | **274,8 hrs** | **96,2% (26,4x más rápido)** |\n| **2. Emisión y Cruce de Cotizaciones B2B** | 141 cot/mes (445 en SQL) | 18,8 hrs/mes | 1,2 hrs/mes | **17,6 hrs** | **211,2 hrs** | **93,6% (15,7x más rápido)** |\n| **3. Estandarización HTML/CSS y Auto-Linker ISO** | 752 fichas vinculadas | 7,5 hrs/mes | 0,2 hrs/mes | **7,3 hrs** | **87,6 hrs** | **97,3% (37,5x más rápido)** |\n| **4. Estandarización de Fotos (800x720) y Categorías** | 1.727 prods (100 ajustes/mes) | 5,0 hrs/mes | 0,3 hrs/mes | **4,7 hrs** | **56,4 hrs** | **94,0% (16,7x más rápido)** |\n| **TOTAL OPERACIÓN CONTINUA** | **2.509 ítems + CRM B2B** | **55,1 hrs/mes** | **2,6 hrs/mes** | **52,5 hrs/mes** | **630,0 hrs/año** | **95,3% (21,2x más rápido)** |\n\n### Porcentaje de Mejora en Tareas Masivas por Lote (Ejecución Puntual)\n\n| Tarea Masiva de Catálogo o Inteligencia Comercial | Tiempo Manual | Tiempo Cloud | Horas Ahorradas | % Mejora (Multiplicador) |\n| :--- | :---: | :---: | :---: | :---: |\n| **Conectar botones de venta cruzada en 752 productos web** | 43,9 horas (5,2 días) | **4,0 minutos** | 43,8 horas | **99,8% (658,5x más rápido)** |\n| **Unificar ~204 Libros de Clientes por Ciudad + Cuentas por Cobrar** | 18,0 horas (2,1 días) | **1,8 minutos** | 17,9 horas | **99,8% (600,0x más rápido)** |\n| **Buscar historial, RUT y cotizaciones de un cliente en 204 ciudades** | 15,0 minutos | **0,01 segundos (SQL)** | 15,0 minutos | **99,9% (90.000x más rápido)** |\n| **Preparar y estructurar las 1.727 fichas para 1 nuevo Marketplace** | 172,7 horas (20,6 días) | **0,5 horas (30 min)** | 172,2 horas | **99,7% (345,4x más rápido)** |\n| **Expandir catálogo completo a 3 nuevos Marketplaces (Falabella, Paris, Lider)** | 518,1 horas (61,7 días) | **1,5 horas** | 516,6 horas | **99,7% (345,4x más rápido)** |\n'
 
 SECCIONES = {
     "1": (
@@ -144,7 +121,7 @@ def abrir_manual():
             input("\nPresiona Enter para volver al Manual...")
         elif op == "7":
             generar_readme_y_dropbox(subir_dbx=True)
-            os.system("cd ~ && git add README.md manual_cloud.py && git commit -m 'Docs: README ejecutivo con tablas comparativas y listas Markdown' >/dev/null 2>&1 && git push origin main")
+            os.system("cd ~ && git add README.md manual_cloud.py && git commit -m 'Docs: README ejecutivo con tablas comparativas y listas Markdown' >/dev/null 2>&1 && git push -f origin main")
             print("\nManual actualizado en GitHub (README.md) y en Dropbox.")
             input("\nPresiona Enter para volver...")
 
