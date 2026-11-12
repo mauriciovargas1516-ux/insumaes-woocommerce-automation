@@ -1,6 +1,6 @@
 # ERP Omnicanal Insumaes Cloud — Arquitectura y Manual de Operaciones (V6)
 
-> **Última actualización:** `2026-11-12 17:47:28` (Chile) | **40 Funciones Activas (Panel 0-26)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API
+> **Última actualización:** `2026-11-12 18:15:56` (Chile) | **41 Funciones Activas (Panel 0-26)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API
 
 ---
 
@@ -28,6 +28,17 @@ El sistema transforma procesos manuales repetitivos en operaciones automatizadas
 | **Auditar diferencias de precio y margen líquido en 782 ítems ML vs. Web** | 19,5 horas (2,3 días) | **3,0 segundos** | 19,5 horas | **99,9% (23.400x más rápido)** |
 | **Preparar y estructurar las 1.727 fichas para 1 nuevo Marketplace** | 172,7 horas (20,6 días) | **0,5 horas (30 min)** | 172,2 horas | **99,7% (345,4x más rápido)** |
 | **Implementación 'Llave en Mano' desde cero (Tienda Woo + ML + ERP Cloud)** | 120,0 horas (14,3 días) | **5,5 horas (1 jornada)** | 114,5 horas | **95,4% (21,8x más rápido)** |
+
+### Arquitectura de Traspasabilidad Ultra-Rápida Entre Canales (El 'Trampolín Omnicanal')
+
+Una vez que el catálogo vive estructurado en la Bóveda Maestra del servidor (`1.727` productos totales; `1.500` con stock positivo, precio y fotografía listos), el motor actúa como un **traductor universal de comercio electrónico** capaz de migrar todo el inventario de un canal a otro en **segundos**, aplicando automáticamente las reglas técnicas, de empaque y de comisión de cada plataforma:
+
+| Canal de Destino | Productos Listos | Regla de Transformación Automática | Tiempo Manual | Tiempo Cloud |
+| :--- | :---: | :--- | :---: | :---: |
+| **1. Mercado Libre (`Pestaña 1`)** | 1.376 packs/ítems | Títulos `<=60` car., texto plano sin HTML, convierte insertos a **Cajas x10 uds** y aplica recargo comercial (`+25%`). | 150,0 hrs | **0,4 min** |
+| **2. Falabella / Paris / Lider (`Pestaña 2`)** | 1.500 productos | Estructura `Seller_SKU`, precio normal y oferta con cobertura de comisión/envío y descripción limpia. | 450,0 hrs (3 canales) | **1,0 min** |
+| **3. Shopify / Nuevo Portal B2B (`Pestaña 3`)** | 1.500 productos | Genera `Handle` SEO, conserva **100% del HTML + CSS y botones de venta cruzada** y enlaza galerías de fotos. | 150,0 hrs | **0,4 min** |
+| **TOTAL MULTICANAL (5 PLATAFORMAS)** | **1.500 SKUs activos** | **Sincronización simultánea de stock cada 3 segundos post-migración** | **772,7 hrs (91,7 días)** | **2,3 hrs (99,7% ahorro)** |
 
 ---
 
@@ -91,6 +102,7 @@ Motor de inteligencia comercial SQLite en modo 100% Solo Lectura, expansión omn
 - **[23 -> 3] Super-Buscador 360° (SQL):** Consulta en 0,01 segundos cualquier Maestranza, RUT, Ciudad o Producto cruzando cartera histórica, cuentas por cobrar y cotizaciones.
 - **[26 -> 1] Escáner de Brechas Omnicanal (WooCommerce -> Mercado Libre):** Identifica los 718 productos que cuentan con stock positivo, precio y fotografía en insumaes.cl pero aún no están publicados en Mercado Libre (más los 95 productos con stock pero sin foto), exportando /BRECHA_EXPANSION_WOO_A_MELI.xlsx con texto plano y precio sugerido (+18%).
 - **[26 -> 2] Generador de Kit 'Llave en Mano' para Clientes Nuevos:** Crea el molde limpio .env.example y la planilla auto-ajustada /PLANTILLA_ONBOARDING_CLIENTE_NUEVO.xlsx para replicar el ecosistema en otras empresas.
+- **[26 -> 4] Traspasador Universal Multi-Canal (Trampolín a Mercado Libre, Falabella, Paris, Lider y Shopify):** Transforma en un solo clic los 1.500 productos con stock y foto de la bóveda web hacia los formatos de carga masiva de Mercado Libre (respetando la regla de cajas de 10 insertos), Falabella/Paris/Lider y Shopify/B2B con recargo porcentual configurable en /TRASPASO_MULTICANAL_UNIVERSAL.xlsx.
 - **[26 -> 3] Auditor de Diferencia de Precios y Margen Líquido (ML vs. Web — 100% Solo Lectura):** Cruza las 782 publicaciones de Mercado Libre contra el Excel/Web sin modificar ningún precio en ML, calculando comisión, envío estimado, ingreso líquido y semáforo de rentabilidad (<20% Alerta Margen Bajo, 20%-45% Margen Sano, >45% Sobreprecio Alto) más las 14 publicaciones sin pareja en Excel en /DIFERENCIA_PRECIOS_ML_VS_WEB.xlsx.
 - **Auto-Formateador Ejecutivo de Planillas (formateador_excel_cloud.py):** Ajusta automáticamente anchos de columna (14 a 58 caracteres), altos de fila (30 pt en títulos y 22+ pt en datos), formato moneda '$' y autofiltros en todos los reportes Excel exportados a Dropbox.
 

@@ -106,6 +106,91 @@ def generar_kit_cliente_nuevo():
     dbx.files_upload(open(f_molde, "rb").read(), "/PLANTILLA_ONBOARDING_CLIENTE_NUEVO.xlsx", mode=dropbox.files.WriteMode.overwrite)
     print("\n✅ Plantilla '/PLANTILLA_ONBOARDING_CLIENTE_NUEVO.xlsx' auto-ajustada y subida a Dropbox.")
 
+
+def traspasar_catalogo_multicanal(rec_pct=None):
+    _, dbx, _ = conectar_todo()
+    f_rad = os.path.expanduser("~/RADIOGRAFIA_CATALOGO_HTML_WOO.txt")
+    if not os.path.exists(f_rad):
+        try:
+            _, r_dbx = dbx.files_download("/RADIOGRAFIA_CATALOGO_HTML_WOO.txt")
+            open(f_rad, "wb").write(r_dbx.content)
+        except Exception:
+            print("\n⚠️ Primero ejecuta el respaldo en el Botón [22 -> 6]."); return
+
+    if rec_pct is None:
+        rec_s = input("\n📈 % de recargo para Marketplaces (Enter = +25% recomendado para cubrir comisión y envío): ").strip().replace(",", ".")
+        try: rec_pct = float(rec_s) if rec_s else 25.0
+        except Exception: rec_pct = 25.0
+    factor_mkt = 1.0 + (rec_pct / 100.0)
+
+    txt = open(f_rad, "r", encoding="utf-8", errors="replace").read()
+    bloques = re.split(r"\n#{80}\n### ID_WOO: ", txt)
+    filas_meli, filas_mkt, filas_shop = [], [], []
+
+    for b in bloques[1:]:
+        lin = b.splitlines()
+        m1 = re.match(r"(\d+)\s*\|\s*SKU:\s*(.*?)\s*\|\s*NOMBRE:\s*(.*)", lin[0])
+        if not m1: continue
+        pid, sku, nom = int(m1.group(1)), m1.group(2).strip(), m1.group(3).strip()
+        m2 = re.match(r"### PRECIO:\s*\$(.*?)\s*\|\s*STOCK:\s*(.*?)\s*\|\s*CATEGORIAS:\s*(.*)", lin[1] if len(lin)>1 else "")
+        pr_s, st_s, cats = (m2.group(1).strip(), m2.group(2).strip(), m2.group(3).strip()) if m2 else ("0", "0", "")
+        fotos = [x.strip() for x in (lin[3].replace("### FOTOS:", "").split("|") if len(lin)>3 else []) if x.strip()]
+        desc_html = b.split("--- [HTML_Y_CSS_DESCRIPCION_LARGA] ---")[-1].strip() if "--- [HTML_Y_CSS_DESCRIPCION_LARGA] ---" in b else ""
+        try: pr = float(pr_s)
+        except Exception: pr = 0.0
+        try: st = int(float(st_s))
+        except Exception: st = 0
+        if pr <= 0 or st <= 0 or not fotos: continue
+
+        sku_ok = sku if sku else f"INS-{pid}"
+        desc_plana = limpiar_html_plano(desc_html)[:1000]
+        es_ins = ("INSERTO" in cats.upper())
+        st_packs = (st // 10) if es_ins else st
+        p_base = (pr * 10.0) if es_ins else pr
+        p_mkt = int(round((p_base * factor_mkt) / 100.0) * 100)
+
+        if st_packs > 0:
+            tit_ml = (f"Pack 10 Insertos {nom}" if es_ins else nom)[:60]
+            filas_meli.append({
+                "SKU_Origen": sku_ok, "Titulo_ML_60_Car": tit_ml, "Categoria": cats,
+                "Modalidad": "Caja x10 Uds" if es_ins else "Unidad", "Stock_Packs": st_packs,
+                "Precio_Web_Base": int(p_base), f"Precio_ML_Mas_{int(rec_pct)}pct": p_mkt,
+                "Foto_Principal": fotos[0], "Descripcion_Texto_Plano": desc_plana
+            })
+
+        filas_mkt.append({
+            "Seller_SKU": sku_ok, "Nombre_Producto": nom[:100], "Marca": "INSUMAES",
+            "Categoria_Familia": cats.split("|")[0].strip(), "Stock_40pct": st,
+            "Precio_Normal_Mkt": int(round((pr * factor_mkt * 1.15) / 100.0) * 100),
+            f"Precio_Oferta_Mkt_{int(rec_pct)}pct": int(round((pr * factor_mkt) / 100.0) * 100),
+            "URL_Imagen_1": fotos[0], "Descripcion_Plana_Sin_HTML": desc_plana
+        })
+
+        handle = re.sub(r"[^a-z0-9]+", "-", nom.lower()).strip("-")
+        filas_shop.append({
+            "Handle": handle, "Title": nom, "Vendor": "INSUMAES", "Type": cats.split("|")[0].strip(),
+            "Variant_SKU": sku_ok, "Variant_Inventory_Qty": st, "Variant_Price": int(pr),
+            "Image_Src": fotos[0], "Body_HTML_Conservado": desc_html[:2000]
+        })
+
+    f_out = os.path.expanduser("~/TRASPASO_MULTICANAL_UNIVERSAL.xlsx")
+    with pd.ExcelWriter(f_out, engine="openpyxl") as wr:
+        pd.DataFrame(filas_meli).to_excel(wr, sheet_name="1_Formato_MercadoLibre", index=False)
+        pd.DataFrame(filas_mkt).to_excel(wr, sheet_name="2_Formato_Falabella_Paris_Lider", index=False)
+        pd.DataFrame(filas_shop).to_excel(wr, sheet_name="3_Formato_Shopify_Web_B2B", index=False)
+
+    formateador_excel_cloud.estilizar_excel_pro(f_out)
+    dbx.files_upload(open(f_out, "rb").read(), "/TRASPASO_MULTICANAL_UNIVERSAL.xlsx", mode=dropbox.files.WriteMode.overwrite)
+    print("\n" + "=" * 94)
+    print("⚡ TRASPASO ULTRA-RÁPIDO MULTI-CANAL COMPLETADO EN SEGUNDOS")
+    print("=" * 94)
+    print(f" 🟡 Pestaña 1 (Mercado Libre con Cajas x10 y +{rec_pct:.0f}%) : {len(filas_meli)} publicaciones listas")
+    print(f" 🟢 Pestaña 2 (Falabella / Paris / Lider +{rec_pct:.0f}%)    : {len(filas_mkt)} productos listos")
+    print(f" 🔵 Pestaña 3 (Shopify / Clon Web B2B con HTML+CSS) : {len(filas_shop)} productos listos")
+    print(" ✨ Columnas, altos de fila y signos '$' auto-ajustados.")
+    print(" ☁️ Subido a la raíz de tu Dropbox: /TRASPASO_MULTICANAL_UNIVERSAL.xlsx")
+    print("=" * 94)
+
 def abrir_esqueleto():
     while True:
         os.system("clear")

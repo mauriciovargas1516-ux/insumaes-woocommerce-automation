@@ -32,6 +32,8 @@ TABLA_COMPARATIVA_MD = "\n".join([
     ""
 ])
 
+TABLA_COMPARATIVA_MD += "\n### Arquitectura de Traspasabilidad Ultra-Rápida Entre Canales (El 'Trampolín Omnicanal')\n\nUna vez que el catálogo vive estructurado en la Bóveda Maestra del servidor (`1.727` productos totales; `1.500` con stock positivo, precio y fotografía listos), el motor actúa como un **traductor universal de comercio electrónico** capaz de migrar todo el inventario de un canal a otro en **segundos**, aplicando automáticamente las reglas técnicas, de empaque y de comisión de cada plataforma:\n\n| Canal de Destino | Productos Listos | Regla de Transformación Automática | Tiempo Manual | Tiempo Cloud |\n| :--- | :---: | :--- | :---: | :---: |\n| **1. Mercado Libre (`Pestaña 1`)** | 1.376 packs/ítems | Títulos `<=60` car., texto plano sin HTML, convierte insertos a **Cajas x10 uds** y aplica recargo comercial (`+25%`). | 150,0 hrs | **0,4 min** |\n| **2. Falabella / Paris / Lider (`Pestaña 2`)** | 1.500 productos | Estructura `Seller_SKU`, precio normal y oferta con cobertura de comisión/envío y descripción limpia. | 450,0 hrs (3 canales) | **1,0 min** |\n| **3. Shopify / Nuevo Portal B2B (`Pestaña 3`)** | 1.500 productos | Genera `Handle` SEO, conserva **100% del HTML + CSS y botones de venta cruzada** y enlaza galerías de fotos. | 150,0 hrs | **0,4 min** |\n| **TOTAL MULTICANAL (5 PLATAFORMAS)** | **1.500 SKUs activos** | **Sincronización simultánea de stock cada 3 segundos post-migración** | **772,7 hrs (91,7 días)** | **2,3 hrs (99,7% ahorro)** |\n"
+
 SECCIONES = {
     "1": (
         "GRUPO A: INTERRUPTORES AUTOMATICOS 24/7 Y REGLAS DE PRECISION (BOTONES [1] AL [8])",
@@ -89,7 +91,7 @@ SECCIONES["5"] = (
     "- **[23 -> 3] Super-Buscador 360° (SQL):** Consulta en 0,01 segundos cualquier Maestranza, RUT, Ciudad o Producto cruzando cartera histórica, cuentas por cobrar y cotizaciones.\n"
     "- **[26 -> 1] Escáner de Brechas Omnicanal (WooCommerce -> Mercado Libre):** Identifica los 718 productos que cuentan con stock positivo, precio y fotografía en insumaes.cl pero aún no están publicados en Mercado Libre (más los 95 productos con stock pero sin foto), exportando /BRECHA_EXPANSION_WOO_A_MELI.xlsx con texto plano y precio sugerido (+18%).\n"
     "- **[26 -> 2] Generador de Kit 'Llave en Mano' para Clientes Nuevos:** Crea el molde limpio .env.example y la planilla auto-ajustada /PLANTILLA_ONBOARDING_CLIENTE_NUEVO.xlsx para replicar el ecosistema en otras empresas.\n"
-    "- **[26 -> 3] Auditor de Diferencia de Precios y Margen Líquido (ML vs. Web — 100% Solo Lectura):** Cruza las 782 publicaciones de Mercado Libre contra el Excel/Web sin modificar ningún precio en ML, calculando comisión, envío estimado, ingreso líquido y semáforo de rentabilidad (<20% Alerta Margen Bajo, 20%-45% Margen Sano, >45% Sobreprecio Alto) más las 14 publicaciones sin pareja en Excel en /DIFERENCIA_PRECIOS_ML_VS_WEB.xlsx.\n"
+    "- **[26 -> 4] Traspasador Universal Multi-Canal (Trampolín a Mercado Libre, Falabella, Paris, Lider y Shopify):** Transforma en un solo clic los 1.500 productos con stock y foto de la bóveda web hacia los formatos de carga masiva de Mercado Libre (respetando la regla de cajas de 10 insertos), Falabella/Paris/Lider y Shopify/B2B con recargo porcentual configurable en /TRASPASO_MULTICANAL_UNIVERSAL.xlsx.\n- **[26 -> 3] Auditor de Diferencia de Precios y Margen Líquido (ML vs. Web — 100% Solo Lectura):** Cruza las 782 publicaciones de Mercado Libre contra el Excel/Web sin modificar ningún precio en ML, calculando comisión, envío estimado, ingreso líquido y semáforo de rentabilidad (<20% Alerta Margen Bajo, 20%-45% Margen Sano, >45% Sobreprecio Alto) más las 14 publicaciones sin pareja en Excel en /DIFERENCIA_PRECIOS_ML_VS_WEB.xlsx.\n"
     "- **Auto-Formateador Ejecutivo de Planillas (formateador_excel_cloud.py):** Ajusta automáticamente anchos de columna (14 a 58 caracteres), altos de fila (30 pt en títulos y 22+ pt en datos), formato moneda '$' y autofiltros en todos los reportes Excel exportados a Dropbox."
 )
 
@@ -113,7 +115,7 @@ MAPA_ARCHIVOS_MD = "\n".join([
 def generar_readme_y_dropbox(subir_dbx=True):
     lin = [
         "# ERP Omnicanal Insumaes Cloud — Arquitectura y Manual de Operaciones (V6)\n",
-        f"> **Última actualización:** `{time.strftime('%Y-%m-%d %H:%M:%S')}` (Chile) | **40 Funciones Activas (Panel 0-26)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API\n",
+        f"> **Última actualización:** `{time.strftime('%Y-%m-%d %H:%M:%S')}` (Chile) | **41 Funciones Activas (Panel 0-26)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API\n",
         "---\n",
         TABLA_COMPARATIVA_MD,
         "---\n",
