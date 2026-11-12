@@ -1,20 +1,22 @@
 # ERP Omnicanal Insumaes Cloud — Arquitectura y Manual de Operaciones (V5)
 
-> **Última actualización:** `2026-11-12 00:13:14` (Chile) | **35 Funciones Activas (Panel 0-24)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API
+> **Última actualización:** `2026-11-12 16:22:44` (Chile) | **35 Funciones Activas (Panel 0-24)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API
 
 ---
 
 ## 1. Impacto Operativo y Porcentaje de Mejora (Trabajo Manual vs. Arquitectura Cloud)
 
-El sistema transforma procesos manuales repetitivos en operaciones automatizadas por lote en Google Cloud, logrando una **mejora de eficiencia del 95,3%** (**21,2 veces más rápido**), con **52,5 horas ahorradas al mes** y **630,0 horas ahorradas al año** (equivalentes a **75,0 jornadas laborales completas** de 8,4 horas):
+**Acceso Rápido (Protegido por Login Google IAM):** [Abrir Consola SSH en Google Cloud (vm-insumaes)](https://ssh.cloud.google.com/v2/ssh/projects/motor-sii-python/zones/us-central1-a/instances/vm-insumaes)
 
-| Proceso Operativo / Comercial | Volumen Activo | Tiempo Manual | Tiempo Cloud | Ahorro / Mes | Ahorro / Año | % Mejora (Velocidad) |
-| :--- | :--- | :---: | :---: | :---: | :---: | :---: |
-| **1. Sincronización Stock y Precios (Woo + ML)** | 2.509 ítems (550 cambios/mes) | 23,8 hrs/mes | 0,9 hrs/mes | **22,9 hrs** | **274,8 hrs** | **96,2% (26,4x más rápido)** |
-| **2. Emisión y Cruce de Cotizaciones B2B** | 141 cot/mes (445 en SQL) | 18,8 hrs/mes | 1,2 hrs/mes | **17,6 hrs** | **211,2 hrs** | **93,6% (15,7x más rápido)** |
-| **3. Estandarización HTML/CSS y Auto-Linker ISO** | 752 fichas vinculadas | 7,5 hrs/mes | 0,2 hrs/mes | **7,3 hrs** | **87,6 hrs** | **97,3% (37,5x más rápido)** |
-| **4. Estandarización de Fotos (800x720) y Categorías** | 1.727 prods (100 ajustes/mes) | 5,0 hrs/mes | 0,3 hrs/mes | **4,7 hrs** | **56,4 hrs** | **94,0% (16,7x más rápido)** |
-| **TOTAL OPERACIÓN CONTINUA** | **2.509 ítems + CRM B2B** | **55,1 hrs/mes** | **2,6 hrs/mes** | **52,5 hrs/mes** | **630,0 hrs/año** | **95,3% (21,2x más rápido)** |
+El sistema transforma procesos manuales repetitivos en operaciones automatizadas por lote en Google Cloud, logrando una **mejora de eficiencia del 95,3%** (**21,2 veces más rápido**), con **52,5 horas ahorradas al mes** y **630,0 horas ahorradas al año** (**75,0 jornadas laborales completas**):
+
+| Proceso Operativo / Comercial | Volumen Activo | Manual vs. Cloud | Ahorro (Mes / Año) | % Mejora (Velocidad) |
+| :--- | :--- | :---: | :---: | :---: |
+| **1. Sincronización Stock y Precios (Woo + ML)** | 2.509 ítems (550 cambios/mes) | 23,8 hrs vs. **0,9 hrs** | **22,9 hrs/mes** (274,8 hrs/año) | **96,2% (26,4x más rápido)** |
+| **2. Emisión y Cruce de Cotizaciones B2B** | 141 cot/mes (445 en SQL) | 18,8 hrs vs. **1,2 hrs** | **17,6 hrs/mes** (211,2 hrs/año) | **93,6% (15,7x más rápido)** |
+| **3. Estandarización HTML/CSS y Auto-Linker ISO** | 752 fichas vinculadas | 7,5 hrs vs. **0,2 hrs** | **7,3 hrs/mes** (87,6 hrs/año) | **97,3% (37,5x más rápido)** |
+| **4. Estandarización de Fotos (800x720) y Categorías** | 1.727 prods (100 ajustes/mes) | 5,0 hrs vs. **0,3 hrs** | **4,7 hrs/mes** (56,4 hrs/año) | **94,0% (16,7x más rápido)** |
+| **TOTAL OPERACIÓN CONTINUA** | **2.509 ítems + CRM B2B** | **55,1 hrs vs. 2,6 hrs** | **52,5 hrs/mes (630,0 hrs/año)** | **95,3% (21,2x más rápido)** |
 
 ### Porcentaje de Mejora en Tareas Masivas por Lote (Ejecución Puntual)
 
@@ -24,7 +26,7 @@ El sistema transforma procesos manuales repetitivos en operaciones automatizadas
 | **Unificar ~204 Libros de Clientes por Ciudad + Cuentas por Cobrar** | 18,0 horas (2,1 días) | **1,8 minutos** | 17,9 horas | **99,8% (600,0x más rápido)** |
 | **Buscar historial, RUT y cotizaciones de un cliente en 204 ciudades** | 15,0 minutos | **0,01 segundos (SQL)** | 15,0 minutos | **99,9% (90.000x más rápido)** |
 | **Preparar y estructurar las 1.727 fichas para 1 nuevo Marketplace** | 172,7 horas (20,6 días) | **0,5 horas (30 min)** | 172,2 horas | **99,7% (345,4x más rápido)** |
-| **Expandir catálogo completo a 3 nuevos Marketplaces (Falabella, Paris, Lider)** | 518,1 horas (61,7 días) | **1,5 horas** | 516,6 horas | **99,7% (345,4x más rápido)** |
+| **Expandir catálogo a 3 nuevos Marketplaces (Falabella, Paris, Lider)** | 518,1 horas (61,7 días) | **1,5 horas** | 516,6 horas | **99,7% (345,4x más rápido)** |
 
 ---
 

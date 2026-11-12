@@ -154,13 +154,13 @@ def indexar_libros_clientes_ciudades():
     rm = dbx.files_list_folder("/Compras L-Angel")
     archs = list(rm.entries)
     while rm.has_more: rm = dbx.files_list_folder_continue(rm.cursor); archs.extend(rm.entries)
-    libros = [f for f in archs if isinstance(f, dropbox.files.FileMetadata) and "libro de clientes" in f.name.lower() and f.name.lower().endswith(".xlsx")]
+    libros = [f for f in archs if isinstance(f, dropbox.files.FileMetadata) and "libro" in f.name.lower() and "cliente" in f.name.lower() and f.name.lower().endswith((".xlsx", ".xlsm")) and not f.name.startswith("~$")]
     libros.sort(key=lambda x: x.size, reverse=True)
     print(f"   -> Se detectaron {len(libros)} Libros de Clientes por Ciudad/Comuna en Chile.", flush=True)
 
     tot_hojas = 0
     for idx, f_lib in enumerate(libros, 1):
-        ciudad = re.sub(r"(?i)libro de clientes\s*", "", os.path.splitext(f_lib.name)[0]).strip(" -")
+        ciudad = re.sub(r"(?i)libro\s+de\s+clientes\s*", "", os.path.splitext(f_lib.name)[0]).strip(" -")
         try:
             _, rp = dbx.files_download(f_lib.path_lower)
             wb = openpyxl.load_workbook(io.BytesIO(rp.content), read_only=True, data_only=True)

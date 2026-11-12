@@ -68,5 +68,7 @@ def ejecutar_rescate_total():
     print(f"  ✅ 2/2: '/{nom_zip}' subido a tu Dropbox ({cont_zip} archivos | {tam_zip//1024:,} KB) en {time.time()-t0:.1f}s.")
     print("=" * 92 + "\n")
 
+generar_y_subir = ejecutar_rescate_total
+
 if __name__ == "__main__":
     ejecutar_rescate_total()
