@@ -1,6 +1,6 @@
 # ERP Omnicanal Insumaes Cloud — Arquitectura y Manual de Operaciones (V6)
 
-> **Última actualización:** `2026-11-12 18:15:56` (Chile) | **41 Funciones Activas (Panel 0-26)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API
+> **Última actualización:** `2026-11-12 18:25:54` (Chile) | **41 Funciones Activas (Panel 0-26)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API
 
 ---
 
