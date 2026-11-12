@@ -43,7 +43,7 @@ SECCIONES = {
 }
 
 SECCIONES["4"] = (
-    "GRUPO D: BOTON [22] — SUITE MAESTRA DE CATALOGO WEB (INSUMAES.CL)",
+    "GRUPO D: BOTONES [22] Y [25] — SUITE DE CATALOGO WEB Y PRECIOS POR %",
     "Automatización de fichas técnicas HTML/CSS, estandarización de imágenes y arquitectura de categorías:\n\n"
     "- **[22 -> 1] Estandarizador Inteligente de Fotos:** Recorta espacio vacío y encuadra imágenes a 800x720 px por ID, Categoría o Web completa.\n"
     "- **[22 -> 2] Auto-Linker de Venta Cruzada:** Conecta bidireccionalmente Portaherramientas, Insertos y Accesorios en las fichas técnicas.\n"
@@ -51,13 +51,14 @@ SECCIONES["4"] = (
     "- **[22 -> 4] Constructor Interactivo de Categorías:** Despliega el árbol jerárquico de categorías de WooCommerce y permite crear nuevas.\n"
     "- **[22 -> 5] Reasignador Definitivo de Categorías:** Traslada lotes de productos (SKU1 | SKU2 | ID) hacia una categoría destino.\n"
     "- **[22 -> 6] Extracción Maestra Web a Dropbox (.TXT):** Respalda las 1.727 fichas HTML y CSS en /RADIOGRAFIA_CATALOGO_HTML_WOO.txt.\n"
-    "- **[22 -> 7] Restaurador de Seguridad (Ctrl+Z):** Restaura el código HTML o la imagen original de cualquier producto desde la bóveda local."
+    "- **[22 -> 7] Restaurador de Seguridad (Ctrl+Z):** Restaura el código HTML o la imagen original de cualquier producto desde la bóveda local.\n"
+    "- **[25] Ajustador Masivo de Precios por % y Ofertas Tachadas:** Permite aplicar aumentos o descuentos porcentuales (+X% / -X%) o activar precios de oferta tachados por Categoría o Lote con redondeo a $100 y reversión instantánea (Ctrl+Z)."
 )
 
 SECCIONES["5"] = (
     "GRUPO E: BOTON [23] — CRM NACIONAL (204 CIUDADES) & COTIZACIONES B2B",
     "Motor de inteligencia comercial SQLite en modo 100% Solo Lectura (sin alterar los archivos Excel originales):\n\n"
-    "- **[23 -> 1] Sincronizar Cotizaciones y Plantilla:** Repara fórmulas J15:J18 en la plantilla oficial e indexa las carpetas mensuales de /COTIZACIONES INSUMAES (445 cotizaciones).\n"
+    "- **[23 -> 1] Sincronizar Cotizaciones y Plantilla:** Valida automáticamente la integridad de fórmulas de subtotales/IVA e indexa las carpetas mensuales de /COTIZACIONES INSUMAES en SQLite.\n"
     "- **[23 -> 2] Unificador Nacional de Clientes y Cobranza:** Lee en modo Solo Lectura los ~204 archivos 'Libro de Clientes [Ciudad].xlsx', 'Cuentas por Cobrar.xlsx' (149 filas) y 'Base-datos-clientes.xlsx' (499 filas), generando /CRM_MAESTRO_NACIONAL_INSUMAES.xlsx.\n"
     "- **[23 -> 3] Super-Buscador 360° (SQL):** Consulta en 0,01 segundos cualquier Maestranza, RUT, Ciudad o Producto cruzando cartera histórica, cuentas por cobrar y cotizaciones."
 )
@@ -65,11 +66,11 @@ SECCIONES["5"] = (
 def generar_readme_y_dropbox(subir_dbx=True):
     lin = [
         "# ERP Omnicanal Insumaes Cloud — Arquitectura y Manual de Operaciones (V5)\n",
-        f"> **Última actualización:** `{time.strftime('%Y-%m-%d %H:%M:%S')}` (Chile) | **35 Funciones Activas (Panel 0-24)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API\n",
+        f"> **Última actualización:** `{time.strftime('%Y-%m-%d %H:%M:%S')}` (Chile) | **36 Funciones Activas (Panel 0-25)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API\n",
         "---\n",
         TABLA_COMPARATIVA_MD,
         "---\n",
-        "## 2. Desglose Funcional de Módulos (Panel de Control 0-24)\n"
+        "## 2. Desglose Funcional de Módulos (Panel de Control 0-25)\n"
     ]
     for k in sorted(SECCIONES.keys()):
         t, c = SECCIONES[k]

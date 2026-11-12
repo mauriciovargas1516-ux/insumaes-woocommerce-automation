@@ -207,10 +207,10 @@ def abrir_centro_cotizaciones():
         n_cli = con.execute("SELECT COUNT(*) FROM Clientes_Ciudad").fetchone()[0]
         con.close()
         print("=" * 96)
-        print("🏢  BOTÓN [23]: CRM NACIONAL (204 CIUDADES), COTIZACIONES B2B & REPARADOR DE PLANTILLA")
+        print("🏢  BOTÓN [23]: CRM NACIONAL (204 CIUDADES), COTIZACIONES B2B & AUDITOR SQL")
         print(f"📊  Bóveda SQLite Activa : ✅ {n_cli} Clientes/Hojas Nacionales | ✅ {n_cot} Cotizaciones Indexadas")
         print("=" * 96)
-        print("  1. 🔧 Reparar Plantilla Cotizaciones (J15:J18) + Sincronizar '/COTIZACIONES INSUMAES'")
+        print("  1. 🔧 Sincronizar e Indexar '/COTIZACIONES INSUMAES' en SQL + Auditar Plantilla")
         print("  2. 🌎 Unificar los ~204 'Libro de Clientes [Ciudad].xlsx' en 1 Excel Maestro Nacional")
         print("  3. 🔎 Super-Buscador 360° (Busca un Cliente, RUT, Ciudad o Producto en Ciudades + Cotizaciones)")
         print("  0. 🔙 Volver al Panel Principal")

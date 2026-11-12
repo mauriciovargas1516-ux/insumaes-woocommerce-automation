@@ -1,6 +1,6 @@
 # ERP Omnicanal Insumaes Cloud — Arquitectura y Manual de Operaciones (V5)
 
-> **Última actualización:** `2026-11-12 16:22:44` (Chile) | **35 Funciones Activas (Panel 0-24)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API
+> **Última actualización:** `2026-11-12 16:41:43` (Chile) | **36 Funciones Activas (Panel 0-25)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API
 
 ---
 
@@ -30,7 +30,7 @@ El sistema transforma procesos manuales repetitivos en operaciones automatizadas
 
 ---
 
-## 2. Desglose Funcional de Módulos (Panel de Control 0-24)
+## 2. Desglose Funcional de Módulos (Panel de Control 0-25)
 
 ### GRUPO A: INTERRUPTORES AUTOMATICOS 24/7 (BOTONES [1] AL [8])
 
@@ -68,7 +68,7 @@ Sistema de respaldo integral de código fuente, bases de datos y estados de inve
 - **[16] EXPORTAR CODIGO/LOGS (.TXT):** Genera y sube /RADIOGRAFIA_ERP_INSUMAES.txt a la raíz de Dropbox.
 - **[21] SINCRONIZAR CODIGO CON GITHUB:** Versiona y publica los módulos .py, .sh y el manual README.md en GitHub.
 
-### GRUPO D: BOTON [22] — SUITE MAESTRA DE CATALOGO WEB (INSUMAES.CL)
+### GRUPO D: BOTONES [22] Y [25] — SUITE DE CATALOGO WEB Y PRECIOS POR %
 
 Automatización de fichas técnicas HTML/CSS, estandarización de imágenes y arquitectura de categorías:
 
@@ -79,12 +79,13 @@ Automatización de fichas técnicas HTML/CSS, estandarización de imágenes y ar
 - **[22 -> 5] Reasignador Definitivo de Categorías:** Traslada lotes de productos (SKU1 | SKU2 | ID) hacia una categoría destino.
 - **[22 -> 6] Extracción Maestra Web a Dropbox (.TXT):** Respalda las 1.727 fichas HTML y CSS en /RADIOGRAFIA_CATALOGO_HTML_WOO.txt.
 - **[22 -> 7] Restaurador de Seguridad (Ctrl+Z):** Restaura el código HTML o la imagen original de cualquier producto desde la bóveda local.
+- **[25] Ajustador Masivo de Precios por % y Ofertas Tachadas:** Permite aplicar aumentos o descuentos porcentuales (+X% / -X%) o activar precios de oferta tachados por Categoría o Lote con redondeo a $100 y reversión instantánea (Ctrl+Z).
 
 ### GRUPO E: BOTON [23] — CRM NACIONAL (204 CIUDADES) & COTIZACIONES B2B
 
 Motor de inteligencia comercial SQLite en modo 100% Solo Lectura (sin alterar los archivos Excel originales):
 
-- **[23 -> 1] Sincronizar Cotizaciones y Plantilla:** Repara fórmulas J15:J18 en la plantilla oficial e indexa las carpetas mensuales de /COTIZACIONES INSUMAES (445 cotizaciones).
+- **[23 -> 1] Sincronizar Cotizaciones y Plantilla:** Valida automáticamente la integridad de fórmulas de subtotales/IVA e indexa las carpetas mensuales de /COTIZACIONES INSUMAES en SQLite.
 - **[23 -> 2] Unificador Nacional de Clientes y Cobranza:** Lee en modo Solo Lectura los ~204 archivos 'Libro de Clientes [Ciudad].xlsx', 'Cuentas por Cobrar.xlsx' (149 filas) y 'Base-datos-clientes.xlsx' (499 filas), generando /CRM_MAESTRO_NACIONAL_INSUMAES.xlsx.
 - **[23 -> 3] Super-Buscador 360° (SQL):** Consulta en 0,01 segundos cualquier Maestranza, RUT, Ciudad o Producto cruzando cartera histórica, cuentas por cobrar y cotizaciones.
 
