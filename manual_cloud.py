@@ -104,18 +104,18 @@ MAPA_ARCHIVOS_MD = "\n".join([
     "",
     "| Capa del Sistema | Archivos `.py` / `.sh` Principales | Rol Técnico dentro del Ecosistema |",
     "| :--- | :--- | :--- |",
-    "| **1. Núcleo y Panel Central** | `panel.py`, `lanzar_todo.sh`, `lee_config.py`, `manual_cloud.py` | Interfaz de control (Botones `0` a `26` — 40 funciones activas), configuración en vivo y documentación automática. |",
+    "| **1. Núcleo y Panel Central** | `panel.py`, `lanzar_todo.sh`, `lee_config.py`, `manual_cloud.py` | Interfaz de control (Botones `0` a `26` — 42 funciones activas), configuración en vivo y documentación automática. |",
     "| **2. Motor Delta 24/7 y Reglas** | `marcha_rapida_delta.py`, `motor_insumaes.py`, `reglas_precision.py`, `radar_vivo.py`, `monitor_detenidas.py` | Sincronización cada 3s, colchón 40%, cortafuegos de precios (0,01s), armado/freno de cajas de 10 insertos y reactivación. |",
     "| **3. Suite WooCommerce (Web)** | `suite_cloud_woo.py`, `autolinker_web.py`, `estandarizador_fotos_woo.py`, `ajustador_precios_woo.py`, `exportar_html_woo.py` | Venta cruzada ISO (752 fichas), fotos `800x720 px`, categorías y ajuste masivo de precios por `%` con ofertas tachadas. |",
     "| **4. Suite Mercado Libre & POS** | `auditor_meli.py`, `nivelar_meli_vivo.py`, `post_meli.py`, `comparador_omnicanal.py`, `pistola_pos.py`, `generador_carta_ean.py` | Sincronización de 782 publicaciones ML, laboratorio piloto, pistola láser POS y pliegos PDF de códigos de barra. |",
-    "| **5. CRM SQLite, B2B y Expansión** | `centro_cotizaciones.py`, `esqueleto_integrador.py`, `formateador_excel_cloud.py`, `rescatar_todo_nube.py`, `.env.example` | SQLite (445 cotizaciones + ~204 ciudades + Cuentas por Cobrar en Solo Lectura), detector de brechas, auditoría de precios ML y backups. |",
+    "| **5. CRM SQLite, B2B y Expansión** | `centro_cotizaciones.py`, `buscador_productos_cotizados.py`, `esqueleto_integrador.py`, `formateador_excel_cloud.py`, `rescatar_todo_nube.py`, `.env.example` | SQLite (445 cotizaciones + ~204 ciudades + Cuentas por Cobrar en Solo Lectura), detector de brechas, auditoría de precios ML y backups. |",
     ""
 ])
 
 def generar_readme_y_dropbox(subir_dbx=True):
     lin = [
         "# ERP Omnicanal Insumaes Cloud — Arquitectura y Manual de Operaciones (V6)\n",
-        f"> **Última actualización:** `{time.strftime('%Y-%m-%d %H:%M:%S')}` (Chile) | **41 Funciones Activas (Panel 0-26)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API\n",
+        f"> **Última actualización:** `{time.strftime('%Y-%m-%d %H:%M:%S')}` (Chile) | **42 Funciones Activas (Panel 0-26)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API\n",
         "---\n",
         TABLA_COMPARATIVA_MD,
         "---\n",

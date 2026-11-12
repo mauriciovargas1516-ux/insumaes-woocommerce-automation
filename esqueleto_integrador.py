@@ -107,26 +107,21 @@ def generar_kit_cliente_nuevo():
     print("\n✅ Plantilla '/PLANTILLA_ONBOARDING_CLIENTE_NUEVO.xlsx' auto-ajustada y subida a Dropbox.")
 
 
+
 def traspasar_catalogo_multicanal(rec_pct=None):
     _, dbx, _ = conectar_todo()
     f_rad = os.path.expanduser("~/RADIOGRAFIA_CATALOGO_HTML_WOO.txt")
     if not os.path.exists(f_rad):
-        try:
-            _, r_dbx = dbx.files_download("/RADIOGRAFIA_CATALOGO_HTML_WOO.txt")
-            open(f_rad, "wb").write(r_dbx.content)
-        except Exception:
-            print("\n⚠️ Primero ejecuta el respaldo en el Botón [22 -> 6]."); return
-
+        _, r_dbx = dbx.files_download("/RADIOGRAFIA_CATALOGO_HTML_WOO.txt")
+        open(f_rad, "wb").write(r_dbx.content)
     if rec_pct is None:
-        rec_s = input("\n📈 % de recargo para Marketplaces (Enter = +25% recomendado para cubrir comisión y envío): ").strip().replace(",", ".")
+        rec_s = input("\n📈 % de recargo para Marketplaces (Enter = +25% recomendado): ").strip().replace(",", ".")
         try: rec_pct = float(rec_s) if rec_s else 25.0
         except Exception: rec_pct = 25.0
     factor_mkt = 1.0 + (rec_pct / 100.0)
-
     txt = open(f_rad, "r", encoding="utf-8", errors="replace").read()
     bloques = re.split(r"\n#{80}\n### ID_WOO: ", txt)
     filas_meli, filas_mkt, filas_shop = [], [], []
-
     for b in bloques[1:]:
         lin = b.splitlines()
         m1 = re.match(r"(\d+)\s*\|\s*SKU:\s*(.*?)\s*\|\s*NOMBRE:\s*(.*)", lin[0])
@@ -141,82 +136,195 @@ def traspasar_catalogo_multicanal(rec_pct=None):
         try: st = int(float(st_s))
         except Exception: st = 0
         if pr <= 0 or st <= 0 or not fotos: continue
-
-        sku_ok = sku if sku else f"INS-{pid}"
-        desc_plana = limpiar_html_plano(desc_html)[:1000]
+        sku_ok, desc_plana = (sku if sku else f"INS-{pid}"), limpiar_html_plano(desc_html)[:1000]
         es_ins = ("INSERTO" in cats.upper())
-        st_packs = (st // 10) if es_ins else st
-        p_base = (pr * 10.0) if es_ins else pr
+        st_packs, p_base = ((st // 10) if es_ins else st), ((pr * 10.0) if es_ins else pr)
         p_mkt = int(round((p_base * factor_mkt) / 100.0) * 100)
-
         if st_packs > 0:
-            tit_ml = (f"Pack 10 Insertos {nom}" if es_ins else nom)[:60]
-            filas_meli.append({
-                "SKU_Origen": sku_ok, "Titulo_ML_60_Car": tit_ml, "Categoria": cats,
-                "Modalidad": "Caja x10 Uds" if es_ins else "Unidad", "Stock_Packs": st_packs,
-                "Precio_Web_Base": int(p_base), f"Precio_ML_Mas_{int(rec_pct)}pct": p_mkt,
-                "Foto_Principal": fotos[0], "Descripcion_Texto_Plano": desc_plana
-            })
-
-        filas_mkt.append({
-            "Seller_SKU": sku_ok, "Nombre_Producto": nom[:100], "Marca": "INSUMAES",
-            "Categoria_Familia": cats.split("|")[0].strip(), "Stock_40pct": st,
-            "Precio_Normal_Mkt": int(round((pr * factor_mkt * 1.15) / 100.0) * 100),
-            f"Precio_Oferta_Mkt_{int(rec_pct)}pct": int(round((pr * factor_mkt) / 100.0) * 100),
-            "URL_Imagen_1": fotos[0], "Descripcion_Plana_Sin_HTML": desc_plana
-        })
-
-        handle = re.sub(r"[^a-z0-9]+", "-", nom.lower()).strip("-")
-        filas_shop.append({
-            "Handle": handle, "Title": nom, "Vendor": "INSUMAES", "Type": cats.split("|")[0].strip(),
-            "Variant_SKU": sku_ok, "Variant_Inventory_Qty": st, "Variant_Price": int(pr),
-            "Image_Src": fotos[0], "Body_HTML_Conservado": desc_html[:2000]
-        })
-
+            filas_meli.append({"SKU_Origen": sku_ok, "Titulo_ML_60_Car": (f"Pack 10 Insertos {nom}" if es_ins else nom)[:60], "Categoria": cats, "Modalidad": "Caja x10 Uds" if es_ins else "Unidad", "Stock_Packs": st_packs, "Precio_Web_Base": int(p_base), f"Precio_ML_Mas_{int(rec_pct)}pct": p_mkt, "Foto_Principal": fotos[0], "Descripcion_Texto_Plano": desc_plana})
+        filas_mkt.append({"Seller_SKU": sku_ok, "Nombre_Producto": nom[:100], "Marca": "INSUMAES", "Categoria_Familia": cats.split("|")[0].strip(), "Stock_40pct": st, "Precio_Normal_Mkt": int(round((pr * factor_mkt * 1.15) / 100.0) * 100), f"Precio_Oferta_Mkt_{int(rec_pct)}pct": int(round((pr * factor_mkt) / 100.0) * 100), "URL_Imagen_1": fotos[0], "Descripcion_Plana_Sin_HTML": desc_plana})
+        filas_shop.append({"Handle": re.sub(r"[^a-z0-9]+", "-", nom.lower()).strip("-"), "Title": nom, "Vendor": "INSUMAES", "Type": cats.split("|")[0].strip(), "Variant_SKU": sku_ok, "Variant_Inventory_Qty": st, "Variant_Price": int(pr), "Image_Src": fotos[0], "Body_HTML_Conservado": desc_html[:2000]})
     f_out = os.path.expanduser("~/TRASPASO_MULTICANAL_UNIVERSAL.xlsx")
     with pd.ExcelWriter(f_out, engine="openpyxl") as wr:
         pd.DataFrame(filas_meli).to_excel(wr, sheet_name="1_Formato_MercadoLibre", index=False)
         pd.DataFrame(filas_mkt).to_excel(wr, sheet_name="2_Formato_Falabella_Paris_Lider", index=False)
         pd.DataFrame(filas_shop).to_excel(wr, sheet_name="3_Formato_Shopify_Web_B2B", index=False)
-
     formateador_excel_cloud.estilizar_excel_pro(f_out)
     dbx.files_upload(open(f_out, "rb").read(), "/TRASPASO_MULTICANAL_UNIVERSAL.xlsx", mode=dropbox.files.WriteMode.overwrite)
-    print("\n" + "=" * 94)
-    print("⚡ TRASPASO ULTRA-RÁPIDO MULTI-CANAL COMPLETADO EN SEGUNDOS")
-    print("=" * 94)
-    print(f" 🟡 Pestaña 1 (Mercado Libre con Cajas x10 y +{rec_pct:.0f}%) : {len(filas_meli)} publicaciones listas")
-    print(f" 🟢 Pestaña 2 (Falabella / Paris / Lider +{rec_pct:.0f}%)    : {len(filas_mkt)} productos listos")
-    print(f" 🔵 Pestaña 3 (Shopify / Clon Web B2B con HTML+CSS) : {len(filas_shop)} productos listos")
-    print(" ✨ Columnas, altos de fila y signos '$' auto-ajustados.")
-    print(" ☁️ Subido a la raíz de tu Dropbox: /TRASPASO_MULTICANAL_UNIVERSAL.xlsx")
-    print("=" * 94)
+    print(f"\n✅ [4] Traspaso Multi-Canal subido a Dropbox: {len(filas_meli)} packs ML | {len(filas_mkt)} Falabella/Paris/Lider | {len(filas_shop)} Shopify.")
 
 def abrir_esqueleto():
     while True:
         os.system("clear")
         print("=" * 96)
-        print("🚀  BOTÓN [26]: ESQUELETO INTEGRADOR OMNICANAL (BRECHAS WOO->ML & KIT CLIENTES NUEVOS)")
+        print("BOTON [26]: ESQUELETO INTEGRADOR OMNICANAL (BRECHAS, PRECIOS ML & TRASPASO MULTICANAL)")
         print("=" * 96)
-        print("  [1] 🔍 Detectar Brechas en Insumaes (Productos listos en Web que faltan en ML + Web sin foto)")
-        print("  [2] 📦 Generar Kit 'Llave en Mano' para Clientes Nuevos (Con Columnas y Filas Auto-Ajustadas)")
-        print("  [0] 🔙 Volver al Panel Principal")
+        print("  [1] Detectar Brechas en Insumaes (Productos listos en Web que faltan en ML + Web sin foto)")
+        print("  [2] Generar Kit 'Llave en Mano' para Clientes Nuevos (.env.example + Plantilla Excel)")
+        print("  [3] Exportar Diferencia de Precios ML vs Web a Dropbox (100% Solo Lectura, jamás toca ML)")
+        print("  [4] Traspasador Rápido Multi-Canal (Exporta Catálogo a ML, Falabella, Paris, Lider y Shopify)")
+        print("  [0] Volver al Panel Principal")
         print("=" * 96)
-        op = input("\n👉 Selecciona una opción (0-2): ").strip()
+        op = input("\nSelecciona una opción (0-4): ").strip()
         if op == "0": break
         elif op == "1": detectar_brechas_omnicanal(); input("\nPresiona Enter para continuar...")
         elif op == "2": generar_kit_cliente_nuevo(); input("\nPresiona Enter para continuar...")
+        elif op == "3": exportar_diferencia_precios_ml_dropbox(); input("\nPresiona Enter para continuar...")
+        elif op == "4": traspasar_catalogo_multicanal(); input("\nPresiona Enter para continuar...")
+
+
+def exportar_diferencia_precios_ml_dropbox():
+    _, dbx, _ = conectar_todo()
+    f_aud = os.path.expanduser("~/AUDITORIA_MELI_INSUMAES.xlsx")
+    if not os.path.exists(f_aud):
+        _, r = dbx.files_download("/AUDITORIA_MELI_INSUMAES.xlsx")
+        open(f_aud, "wb").write(r.content)
+    df = pd.read_excel(f_aud, sheet_name="AUDITORIA_MELI")
+    todas, alerta, sin_par = [], [], []
+    for _, r in df.iterrows():
+        est = str(r.get("Estado", "")).strip()
+        mlc = str(r.get("Código ML (Ver Web)", "")).strip()
+        nom_ml = str(r.get("Nombre en Mercado Libre", "")).strip()
+        nom_ex = str(r.get("Nombre en tu Excel (Ir a Celda)", "")).strip()
+        pest = str(r.get("Pestaña del Excel", "")).strip()
+        pack = r.get("Unid. x Pack", 1)
+        st_bod = r.get("Stock Bodega", 0)
+        pub_ml = r.get("Publicado Hoy en ML", 0)
+        p_ex, p_ml = r.get("Precio Excel"), r.get("Precio ML")
+        try: vx = float(p_ex) if pd.notna(p_ex) else 0.0
+        except Exception: vx = 0.0
+        try: vm = float(p_ml) if pd.notna(p_ml) else 0.0
+        except Exception: vm = 0.0
+        if vx <= 0 or "Sin Pareja" in est:
+            sin_par.append({
+                "Codigo_ML": mlc, "Estado_ML": est,
+                "Nombre_Mercado_Libre": nom_ml,
+                "Publicado_Hoy_ML": pub_ml,
+                "Precio_Actual_ML": int(vm)
+            })
+            continue
+        dif_clp = int(round(vm - vx))
+        dif_pct = round(((vm - vx) / vx) * 100.0, 1)
+        envio = 3800 if vm >= 19990 else 1000
+        liq_ml = int(round((vm * 0.86) - envio))
+        gan_web = int(round(liq_ml - vx))
+        if dif_pct < 20.0 or gan_web < 0:
+            sem = "ALERTA MARGEN BAJO (<20% o Pierde vs Web)"
+        elif dif_pct <= 45.0:
+            sem = "MARGEN SANO (+20% a +45%)"
+        else:
+            sem = "SOBREPRECIO ALTO (> +45%)"
+        reg = {
+            "Semaforo_Rentabilidad": sem, "Codigo_ML": mlc,
+            "Pestana_Excel": pest, "Producto_Excel": nom_ex,
+            "Titulo_Mercado_Libre": nom_ml, "Unid_x_Pack": pack,
+            "Stock_Bodega": st_bod, "Publicado_ML": pub_ml,
+            "Precio_Excel_Web": int(round(vx)),
+            "Precio_Actual_ML": int(round(vm)),
+            "Diferencia_Pesos": dif_clp,
+            "Recargo_ML_Pct": f"{dif_pct:+.1f}%",
+            "Liquido_Estimado_ML": liq_ml,
+            "Diferencia_Liquida_vs_Web": gan_web
+        }
+        todas.append((dif_pct, reg))
+        if "ALERTA" in sem:
+            alerta.append((dif_pct, reg))
+    todas.sort(key=lambda x: x[0])
+    alerta.sort(key=lambda x: x[0])
+    f_out = os.path.expanduser("~/DIFERENCIA_PRECIOS_ML_VS_WEB.xlsx")
+    with pd.ExcelWriter(f_out, engine="openpyxl") as wr:
+        d1 = pd.DataFrame([x[1] for x in alerta])
+        d2 = pd.DataFrame([x[1] for x in todas])
+        d3 = pd.DataFrame(sin_par)
+        d1.to_excel(wr, sheet_name="1_Alerta_Margen_Bajo_ML", index=False)
+        d2.to_excel(wr, sheet_name="2_Comparativa_782_Items", index=False)
+        d3.to_excel(wr, sheet_name="3_Sin_Pareja_En_Excel", index=False)
+    formateador_excel_cloud.estilizar_excel_pro(f_out)
+    dbx.files_upload(
+        open(f_out, "rb").read(),
+        "/DIFERENCIA_PRECIOS_ML_VS_WEB.xlsx",
+        mode=dropbox.files.WriteMode.overwrite
+    )
+    print(f"\n[OK] [3] Auditoria lista: {len(todas)} cruzados | "
+          f"{len(alerta)} en Alerta (<20%) | {len(sin_par)} sin pareja\n"
+          "     -> /DIFERENCIA_PRECIOS_ML_VS_WEB.xlsx")
+
+
+def exportar_diferencia_precios_ml_dropbox():
+    _, dbx, _ = conectar_todo()
+    f_aud = os.path.expanduser("~/AUDITORIA_MELI_INSUMAES.xlsx")
+    if not os.path.exists(f_aud):
+        _, r = dbx.files_download("/AUDITORIA_MELI_INSUMAES.xlsx")
+        open(f_aud, "wb").write(r.content)
+    df = pd.read_excel(f_aud, sheet_name="AUDITORIA_MELI")
+    todas, alerta, sin_par = [], [], []
+    for _, r in df.iterrows():
+        est = str(r.get("Estado", "")).strip()
+        mlc = str(r.get("Código ML (Ver Web)", "")).strip()
+        nom_ml = str(r.get("Nombre en Mercado Libre", "")).strip()
+        nom_ex = str(r.get("Nombre en tu Excel (Ir a Celda)", "")).strip()
+        pest = str(r.get("Pestaña del Excel", "")).strip()
+        pack = r.get("Unid. x Pack", 1)
+        st_bod = r.get("Stock Bodega", 0)
+        pub_ml = r.get("Publicado Hoy en ML", 0)
+        p_ex, p_ml = r.get("Precio Excel"), r.get("Precio ML")
+        try: vx = float(p_ex) if pd.notna(p_ex) else 0.0
+        except Exception: vx = 0.0
+        try: vm = float(p_ml) if pd.notna(p_ml) else 0.0
+        except Exception: vm = 0.0
+        if vx <= 0 or "Sin Pareja" in est:
+            sin_par.append({
+                "Codigo_ML": mlc, "Estado_ML": est,
+                "Nombre_Mercado_Libre": nom_ml,
+                "Publicado_Hoy_ML": pub_ml,
+                "Precio_Actual_ML": int(vm)
+            })
+            continue
+        dif_clp = int(round(vm - vx))
+        dif_pct = round(((vm - vx) / vx) * 100.0, 1)
+        envio = 3800 if vm >= 19990 else 1000
+        liq_ml = int(round((vm * 0.86) - envio))
+        gan_web = int(round(liq_ml - vx))
+        if dif_pct < 20.0 or gan_web < 0:
+            sem = "ALERTA MARGEN BAJO (<20% o Pierde vs Web)"
+        elif dif_pct <= 45.0:
+            sem = "MARGEN SANO (+20% a +45%)"
+        else:
+            sem = "SOBREPRECIO ALTO (> +45%)"
+        reg = {
+            "Semaforo_Rentabilidad": sem, "Codigo_ML": mlc,
+            "Pestana_Excel": pest, "Producto_Excel": nom_ex,
+            "Titulo_Mercado_Libre": nom_ml, "Unid_x_Pack": pack,
+            "Stock_Bodega": st_bod, "Publicado_ML": pub_ml,
+            "Precio_Excel_Web": int(round(vx)),
+            "Precio_Actual_ML": int(round(vm)),
+            "Diferencia_Pesos": dif_clp,
+            "Recargo_ML_Pct": f"{dif_pct:+.1f}%",
+            "Liquido_Estimado_ML": liq_ml,
+            "Diferencia_Liquida_vs_Web": gan_web
+        }
+        todas.append((dif_pct, reg))
+        if "ALERTA" in sem:
+            alerta.append((dif_pct, reg))
+    todas.sort(key=lambda x: x[0])
+    alerta.sort(key=lambda x: x[0])
+    f_out = os.path.expanduser("~/DIFERENCIA_PRECIOS_ML_VS_WEB.xlsx")
+    with pd.ExcelWriter(f_out, engine="openpyxl") as wr:
+        d1 = pd.DataFrame([x[1] for x in alerta])
+        d2 = pd.DataFrame([x[1] for x in todas])
+        d3 = pd.DataFrame(sin_par)
+        d1.to_excel(wr, sheet_name="1_Alerta_Margen_Bajo_ML", index=False)
+        d2.to_excel(wr, sheet_name="2_Comparativa_782_Items", index=False)
+        d3.to_excel(wr, sheet_name="3_Sin_Pareja_En_Excel", index=False)
+    formateador_excel_cloud.estilizar_excel_pro(f_out)
+    dbx.files_upload(
+        open(f_out, "rb").read(),
+        "/DIFERENCIA_PRECIOS_ML_VS_WEB.xlsx",
+        mode=dropbox.files.WriteMode.overwrite
+    )
+    print(f"\n[OK] [3] Auditoria lista: {len(todas)} cruzados | "
+          f"{len(alerta)} en Alerta (<20%) | {len(sin_par)} sin pareja\n"
+          "     -> /DIFERENCIA_PRECIOS_ML_VS_WEB.xlsx")
 
 if __name__ == "__main__":
-    import sys
-    if "--run" in sys.argv:
-        detectar_brechas_omnicanal()
-        generar_kit_cliente_nuevo()
-        _, dbx, _ = conectar_todo()
-        for nom_x in ("CRM_MAESTRO_NACIONAL_INSUMAES.xlsx", "REPORTE_MAESTRO_COTIZACIONES_2026.xlsx"):
-            p_x = os.path.expanduser(f"~/{nom_x}")
-            if os.path.exists(p_x):
-                formateador_excel_cloud.estilizar_excel_pro(p_x)
-                dbx.files_upload(open(p_x, "rb").read(), f"/{nom_x}", mode=dropbox.files.WriteMode.overwrite)
-                print(f"✨ '{nom_x}' auto-ajustado en alto/ancho y actualizado en tu Dropbox.")
-    else:
-        abrir_esqueleto()
+    abrir_esqueleto()

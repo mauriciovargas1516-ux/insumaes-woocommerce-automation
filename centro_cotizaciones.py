@@ -213,12 +213,17 @@ def abrir_centro_cotizaciones():
         print("  1. 🔧 Sincronizar e Indexar '/COTIZACIONES INSUMAES' en SQL + Auditar Plantilla")
         print("  2. 🌎 Unificar los ~204 'Libro de Clientes [Ciudad].xlsx' en 1 Excel Maestro Nacional")
         print("  3. 🔎 Super-Buscador 360° (Busca un Cliente, RUT, Ciudad o Producto en Ciudades + Cotizaciones)")
+        print(" 4. 🎯 Buscar Producto en Cotizaciones (Escoge Familia o Escribe + Excel a Dropbox)")
         print("  0. 🔙 Volver al Panel Principal")
         print("=" * 96)
-        op = input("\n👉 Selecciona una opción (0-3): ").strip()
+        op = input("\n👉 Selecciona una opción (0-4): ").strip()
         if op == "0": break
         elif op == "1": sincronizar_cotizaciones_dropbox(); input("\nPresiona Enter para continuar...")
         elif op == "2": indexar_libros_clientes_ciudades(); input("\nPresiona Enter para continuar...")
+        elif op == "4":
+            import buscador_productos_cotizados
+            buscador_productos_cotizados.buscar_producto_en_cotizaciones()
+            input("\nPresiona Enter para continuar...")
         elif op == "3":
             q = input("\n🔎 Escribe Cliente, Maestranza, RUT, Ciudad o Producto a buscar: ").strip().upper()
             if q:
