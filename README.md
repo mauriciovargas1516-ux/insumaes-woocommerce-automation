@@ -1,6 +1,6 @@
 # ERP Omnicanal Insumaes Cloud — Arquitectura y Manual de Operaciones (V5)
 
-> **Última actualización:** `2026-11-12 16:41:43` (Chile) | **36 Funciones Activas (Panel 0-25)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API
+> **Última actualización:** `2026-11-12 16:59:52` (Chile) | **38 Funciones Activas (Panel 0-26)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API
 
 ---
 
@@ -98,3 +98,18 @@ Motor de inteligencia comercial SQLite en modo 100% Solo Lectura (sin alterar lo
 - **Ejecutar Rescate Completo a Dropbox (`.TXT` y `.ZIP`):** `python3 -u ~/rescatar_todo_nube.py`
 - **Abrir Suite Maestra Web (`[22]`):** `python3 ~/suite_cloud_woo.py`
 - **Abrir CRM Nacional y Cotizaciones B2B (`[23]`):** `python3 ~/centro_cotizaciones.py`
+- **Abrir Esqueleto Integrador y Detector de Brechas (`[26]`):** `python3 ~/esqueleto_integrador.py`
+
+---
+
+## 4. Arquitectura de Archivos del Repositorio (Índice de Módulos por Capa)
+
+Para mantener importación directa en tiempo real con el demonio activo en RAM, los módulos residen en la raíz organizados en **5 capas de ingeniería**:
+
+| Capa del Sistema | Archivos `.py` / `.sh` Principales | Rol Técnico dentro del Ecosistema |
+| :--- | :--- | :--- |
+| **1. Núcleo y Panel Central** | `panel.py`, `lanzar_todo.sh`, `lee_config.py`, `manual_cloud.py` | Interfaz de control (Botones `0` a `26`), configuración en vivo y documentación automática. |
+| **2. Motor Delta 24/7 y Reglas** | `marcha_rapida_delta.py`, `motor_insumaes.py`, `reglas_precision.py`, `radar_vivo.py`, `monitor_detenidas.py` | Sincronización cada 3s, colchón 40%, cortafuegos de precios, cajas de 10 insertos y reactivación. |
+| **3. Suite WooCommerce (Web)** | `suite_cloud_woo.py`, `autolinker_web.py`, `estandarizador_fotos_woo.py`, `ajustador_precios_woo.py`, `exportar_html_woo.py` | Venta cruzada ISO (752 fichas), fotos `800x720 px`, categorías y ajuste masivo de precios por `%`. |
+| **4. Suite Mercado Libre & POS** | `auditor_meli.py`, `nivelar_meli_vivo.py`, `post_meli.py`, `comparador_omnicanal.py`, `pistola_pos.py`, `generador_carta_ean.py` | Sincronización de 782 publicaciones ML, laboratorio piloto, pistola láser POS y códigos de barra. |
+| **5. CRM SQLite, B2B y Rescate** | `centro_cotizaciones.py`, `esqueleto_integrador.py`, `rescatar_todo_nube.py`, `vigia_github.py`, `.env.example` | SQLite (445 cotizaciones + ~204 ciudades + Cuentas por Cobrar en Solo Lectura), brechas y backups. |

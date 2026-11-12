@@ -66,7 +66,7 @@ SECCIONES["5"] = (
 def generar_readme_y_dropbox(subir_dbx=True):
     lin = [
         "# ERP Omnicanal Insumaes Cloud — Arquitectura y Manual de Operaciones (V5)\n",
-        f"> **Última actualización:** `{time.strftime('%Y-%m-%d %H:%M:%S')}` (Chile) | **36 Funciones Activas (Panel 0-25)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API\n",
+        f"> **Última actualización:** `{time.strftime('%Y-%m-%d %H:%M:%S')}` (Chile) | **38 Funciones Activas (Panel 0-26)** | **Stack:** Python, Google Cloud VM, SQLite, WooCommerce API, Mercado Libre API, Dropbox API\n",
         "---\n",
         TABLA_COMPARATIVA_MD,
         "---\n",
@@ -80,7 +80,8 @@ def generar_readme_y_dropbox(subir_dbx=True):
                "- **Abrir Manual de Operaciones:** `python3 ~/manual_cloud.py`\n"
                "- **Ejecutar Rescate Completo a Dropbox (`.TXT` y `.ZIP`):** `python3 -u ~/rescatar_todo_nube.py`\n"
                "- **Abrir Suite Maestra Web (`[22]`):** `python3 ~/suite_cloud_woo.py`\n"
-               "- **Abrir CRM Nacional y Cotizaciones B2B (`[23]`):** `python3 ~/centro_cotizaciones.py`\n")
+               "- **Abrir CRM Nacional y Cotizaciones B2B (`[23]`):** `python3 ~/centro_cotizaciones.py`\n"
+               "- **Abrir Esqueleto Integrador y Detector de Brechas (`[26]`):** `python3 ~/esqueleto_integrador.py`\n\n" + '---\n\n## 4. Arquitectura de Archivos del Repositorio (Índice de Módulos por Capa)\n\nPara mantener importación directa en tiempo real con el demonio activo en RAM, los módulos residen en la raíz organizados en **5 capas de ingeniería**:\n\n| Capa del Sistema | Archivos `.py` / `.sh` Principales | Rol Técnico dentro del Ecosistema |\n| :--- | :--- | :--- |\n| **1. Núcleo y Panel Central** | `panel.py`, `lanzar_todo.sh`, `lee_config.py`, `manual_cloud.py` | Interfaz de control (Botones `0` a `26`), configuración en vivo y documentación automática. |\n| **2. Motor Delta 24/7 y Reglas** | `marcha_rapida_delta.py`, `motor_insumaes.py`, `reglas_precision.py`, `radar_vivo.py`, `monitor_detenidas.py` | Sincronización cada 3s, colchón 40%, cortafuegos de precios, cajas de 10 insertos y reactivación. |\n| **3. Suite WooCommerce (Web)** | `suite_cloud_woo.py`, `autolinker_web.py`, `estandarizador_fotos_woo.py`, `ajustador_precios_woo.py`, `exportar_html_woo.py` | Venta cruzada ISO (752 fichas), fotos `800x720 px`, categorías y ajuste masivo de precios por `%`. |\n| **4. Suite Mercado Libre & POS** | `auditor_meli.py`, `nivelar_meli_vivo.py`, `post_meli.py`, `comparador_omnicanal.py`, `pistola_pos.py`, `generador_carta_ean.py` | Sincronización de 782 publicaciones ML, laboratorio piloto, pistola láser POS y códigos de barra. |\n| **5. CRM SQLite, B2B y Rescate** | `centro_cotizaciones.py`, `esqueleto_integrador.py`, `rescatar_todo_nube.py`, `vigia_github.py`, `.env.example` | SQLite (445 cotizaciones + ~204 ciudades + Cuentas por Cobrar en Solo Lectura), brechas y backups. |\n')
     md = "\n".join(lin)
     open(os.path.expanduser("~/README.md"), "w", encoding="utf-8").write(md)
     open(os.path.expanduser("~/MANUAL_INSTRUCCIONES_INSUMAES.txt"), "w", encoding="utf-8").write(md)

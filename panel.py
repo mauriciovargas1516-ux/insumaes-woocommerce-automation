@@ -133,10 +133,11 @@ def menu():
         print(" [23] 🏢 CRM NACIONAL & COTIZACIONES B2B| Unifica 204 Libros de Clientes, Cotizaciones y Plantilla")
         print(" [24] 📖 MANUAL E INSTRUCCIONES (AYUDA) | Guía interactiva de los 24 botones + Portada README GitHub")
         print(" [25] 💹 AJUSTADOR PRECIOS % (CATEGORÍA)| Sube/baja % o crea Ofertas Tachadas por Categoría + Ctrl+Z")
+        print(" [26] 🚀 ESQUELETO INTEGRADOR & BRECHAS | Detecta productos Web que faltan en ML + Kit Cliente Nuevo")
         print("==========================================================================================")
         print(" [0] Salir (Todo se guarda solo al presionar cada número)")
         if msg: print(f"\n💡 {msg}"); msg = ""
-        op = pedir_opcion_vivo("\n👉 Opción (0-25): ")
+        op = pedir_opcion_vivo("\n👉 Opción (0-26): ")
         if op == "0": guardar(c); break
         elif op == "6": msg = "🔒 MELI_PRECIOS está BLOQUEADO por seguridad."
         elif op in ("1", "2", "3", "4"):
@@ -214,6 +215,8 @@ def menu():
             import manual_cloud; manual_cloud.abrir_manual()
         elif op == "25":
             import ajustador_precios_woo; ajustador_precios_woo.menu_precios()
+        elif op == "26":
+            import esqueleto_integrador; esqueleto_integrador.abrir_esqueleto()
         elif op == "21":
             os.system("cd ~ && git add .gitignore *.py *.sh && git commit -m 'Auto-Sync desde Panel ERP' 2>/dev/null; git pull --rebase origin main 2>/dev/null; git push origin main"); input("\n✅ Código sincronizado con tu GitHub (mauriciovargas1516-ux). Enter para volver...")
         elif op == "15":
