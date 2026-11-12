@@ -1,7 +1,7 @@
-import os, re, json, time, dropbox
+import os, re, json, time, html, dropbox
 import pandas as pd
-import html
 from woocommerce import API
+import formateador_excel_cloud
 
 os.environ["TZ"] = "America/Santiago"
 try: time.tzset()
@@ -21,78 +21,77 @@ def limpiar_html_plano(html_txt):
 
 def detectar_brechas_omnicanal():
     _, dbx, _ = conectar_todo()
-    f_woo = os.path.expanduser("~/respaldo_html_completo_woo.json")
+    f_rad = os.path.expanduser("~/RADIOGRAFIA_CATALOGO_HTML_WOO.txt")
+    if not os.path.exists(f_rad):
+        try:
+            _, r_dbx = dbx.files_download("/RADIOGRAFIA_CATALOGO_HTML_WOO.txt")
+            open(f_rad, "wb").write(r_dbx.content)
+        except Exception:
+            print("\n⚠️ Primero ejecuta el respaldo en el Botón [22 -> 6]."); return
+
+    meli_set = set()
     f_map = os.path.expanduser("~/mapas_rapidos_cache.json")
-    if not os.path.exists(f_woo):
-        print("\n⚠️ Primero ejecuta el respaldo HTML en el Botón [22 -> 6]."); return
+    if os.path.exists(f_map):
+        mp = json.load(open(f_map, "r", encoding="utf-8"))
+        for k, v in mp.items():
+            if "meli" in k.lower() and isinstance(v, dict):
+                meli_set.update(str(x).strip().upper() for x in v.keys())
+    f_aud = os.path.expanduser("~/AUDITORIA_MELI_INSUMAES.xlsx")
+    if os.path.exists(f_aud):
+        try:
+            df_a = pd.read_excel(f_aud)
+            for col in df_a.columns:
+                if any(w in str(col).upper() for w in ("SKU", "TITULO", "NOMBRE", "EXCEL", "CATALOGO")):
+                    meli_set.update(str(x).strip().upper() for x in df_a[col].dropna())
+        except Exception: pass
 
-    datos_woo = json.load(open(f_woo, "r", encoding="utf-8"))
-    mapas = json.load(open(f_map, "r", encoding="utf-8")) if os.path.exists(f_map) else {}
-    meli_vinculados = set()
-    for k_sub in ("meli_por_sku", "meli_por_nombre", "meli"):
-        if isinstance(mapas.get(k_sub), dict):
-            meli_vinculados.update(str(x).strip().upper() for x in mapas[k_sub].keys())
+    txt = open(f_rad, "r", encoding="utf-8", errors="replace").read()
+    bloques = re.split(r"\n#{80}\n### ID_WOO: ", txt)
+    listos_ml, sin_foto = [], []
 
-    listos_para_ml, sin_foto_web = [], []
-    for pid, p in datos_woo.items():
-        nom = (p.get("name") or "").strip()
-        sku = (p.get("sku") or "").strip()
-        try: pr = float(p.get("regular_price") or p.get("price") or 0)
+    for b in bloques[1:]:
+        lin = b.splitlines()
+        m1 = re.match(r"(\d+)\s*\|\s*SKU:\s*(.*?)\s*\|\s*NOMBRE:\s*(.*)", lin[0])
+        if not m1: continue
+        pid, sku, nom = int(m1.group(1)), m1.group(2).strip(), m1.group(3).strip()
+        m2 = re.match(r"### PRECIO:\s*\$(.*?)\s*\|\s*STOCK:\s*(.*?)\s*\|\s*CATEGORIAS:\s*(.*)", lin[1] if len(lin)>1 else "")
+        pr_s, st_s, cats = (m2.group(1).strip(), m2.group(2).strip(), m2.group(3).strip()) if m2 else ("0", "0", "")
+        fotos = [x.strip() for x in (lin[3].replace("### FOTOS:", "").split("|") if len(lin)>3 else []) if x.strip()]
+        desc_html = b.split("--- [HTML_Y_CSS_DESCRIPCION_LARGA] ---")[-1].strip() if "--- [HTML_Y_CSS_DESCRIPCION_LARGA] ---" in b else ""
+        try: pr = float(pr_s)
         except Exception: pr = 0.0
-        try: st = int(float(p.get("stock_quantity") or 0))
+        try: st = int(float(st_s))
         except Exception: st = 0
-        imgs = p.get("images") or []
-        cats = " | ".join(c.get("name", "") for c in (p.get("categories") or []))
-        url_foto = imgs[0].get("src", "") if imgs else ""
 
         if pr > 0 and st > 0:
-            if not url_foto:
-                sin_foto_web.append({"ID_WOO": int(pid), "SKU": sku, "Nombre": nom, "Precio_Web_IVA": int(pr), "Stock_Web_40pct": st, "Categorias": cats})
-            elif nom.upper() not in meli_vinculados and (not sku or sku.upper() not in meli_vinculados):
-                listos_para_ml.append({
-                    "ID_WOO": int(pid), "SKU": sku, "Titulo_Sugerido_ML": nom[:60],
-                    "Categoria_Web": cats, "Stock_Disponible_40pct": st,
-                    "Precio_Web_IVA": int(pr), "Precio_Sugerido_ML_Mas_18pct": int(round((pr * 1.18) / 100.0) * 100),
-                    "URL_Foto_Principal": url_foto,
-                    "Descripcion_Texto_Plano_ML": limpiar_html_plano(p.get("description", ""))[:1500]
+            if not fotos:
+                sin_foto.append({"ID_WOO": pid, "SKU": sku, "Nombre_Producto": nom, "Precio_Web_IVA": int(pr), "Stock_Web_40pct": st, "Categorias_Web": cats})
+            elif nom.upper() not in meli_set and (not sku or sku.upper() not in meli_set):
+                listos_ml.append({
+                    "ID_WOO": pid, "SKU": sku, "Titulo_Sugerido_ML": nom[:60],
+                    "Categorias_Web": cats, "Stock_Web_40pct": st,
+                    "Precio_Web_IVA": int(pr), "Precio_Sugerido_ML_18pct": int(round((pr * 1.18) / 100.0) * 100),
+                    "URL_Foto_Principal": fotos[0],
+                    "Descripcion_Limpia_ML": limpiar_html_plano(desc_html)[:500]
                 })
-
     f_out = os.path.expanduser("~/BRECHA_EXPANSION_WOO_A_MELI.xlsx")
     with pd.ExcelWriter(f_out, engine="openpyxl") as wr:
-        pd.DataFrame(listos_para_ml).to_excel(wr, sheet_name="Listos_Para_Subir_a_ML", index=False)
-        pd.DataFrame(sin_foto_web).to_excel(wr, sheet_name="Con_Stock_Pero_Sin_Foto", index=False)
+        pd.DataFrame(listos_ml).to_excel(wr, sheet_name="Listos_Para_Subir_a_ML", index=False)
+        pd.DataFrame(sin_foto).to_excel(wr, sheet_name="Con_Stock_Pero_Sin_Foto", index=False)
 
+    formateador_excel_cloud.estilizar_excel_pro(f_out)
     dbx.files_upload(open(f_out, "rb").read(), "/BRECHA_EXPANSION_WOO_A_MELI.xlsx", mode=dropbox.files.WriteMode.overwrite)
     print("\n" + "=" * 92)
     print("📊 RESULTADO DEL ESCÁNER DE BRECHAS OMNICANAL (WOO -> MERCADO LIBRE)")
     print("=" * 92)
-    print(f" 🚀 Productos con Stock, Precio y Foto listos para subir a ML : {len(listos_para_ml)} productos")
-    print(f" 📸 Productos con Stock y Precio en Web pero SIN fotografía   : {len(sin_foto_web)} productos")
+    print(f" 🚀 Productos con Stock, Precio y Foto listos para subir a ML : {len(listos_ml)} productos")
+    print(f" 📸 Productos con Stock y Precio en Web pero SIN fotografía   : {len(sin_foto)} productos")
+    print(" ✨ Columnas, altos de fila, formato moneda $ y autofiltros auto-ajustados.")
     print(" ☁️ Excel subido a la raíz de tu Dropbox: /BRECHA_EXPANSION_WOO_A_MELI.xlsx")
     print("=" * 92)
 
 def generar_kit_cliente_nuevo():
     _, dbx, _ = conectar_todo()
-    env_example = "\n".join([
-        "# ==============================================================================",
-        "# PLANTILLA DE CREDENCIALES (.env.example) - ESQUELETO OMNICANAL CLOUD",
-        "# Copia este archivo como ~/.env en el servidor del cliente y rellena sus llaves",
-        "# ==============================================================================",
-        'WOO_URL="https://www.tienda-cliente.cl/"',
-        'WOO_KEY="ck_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"',
-        'WOO_SECRET="cs_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"',
-        'DROPBOX_APP_KEY="xxxxxxxxxxxxxxx"',
-        'DROPBOX_APP_SECRET="xxxxxxxxxxxxxxx"',
-        'DROPBOX_REFRESH_TOKEN="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"',
-        'MELI_APP_ID="xxxxxxxxxxxxxxxx"',
-        'MELI_CLIENT_SECRET="xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"',
-        'MELI_REFRESH_TOKEN="TG-xxxxxxxxxxxxxxxxxxxxxxxx-xxxxxxxx"',
-        'GMAIL_USER="reportes@tienda-cliente.cl"',
-        'GMAIL_PASS="xxxx xxxx xxxx xxxx"',
-        ""
-    ])
-    open(os.path.expanduser("~/.env.example"), "w", encoding="utf-8").write(env_example)
-
     df_molde = pd.DataFrame([
         {
             "SKU": "EJEMPLO-001", "Nombre_Producto": "PORTAHERRAMIENTA EXTERIOR WTJNR2020K16",
@@ -103,10 +102,9 @@ def generar_kit_cliente_nuevo():
     ])
     f_molde = os.path.expanduser("~/PLANTILLA_ONBOARDING_CLIENTE_NUEVO.xlsx")
     df_molde.to_excel(f_molde, index=False)
+    formateador_excel_cloud.estilizar_excel_pro(f_molde)
     dbx.files_upload(open(f_molde, "rb").read(), "/PLANTILLA_ONBOARDING_CLIENTE_NUEVO.xlsx", mode=dropbox.files.WriteMode.overwrite)
-    print("\n✅ Kit de Comercialización creado con éxito:")
-    print("   1) Molde '~/.env.example' listo para tu repositorio GitHub (0% claves reales expuestas).")
-    print("   2) Planilla '/PLANTILLA_ONBOARDING_CLIENTE_NUEVO.xlsx' subida a la raíz de tu Dropbox.")
+    print("\n✅ Plantilla '/PLANTILLA_ONBOARDING_CLIENTE_NUEVO.xlsx' auto-ajustada y subida a Dropbox.")
 
 def abrir_esqueleto():
     while True:
@@ -115,7 +113,7 @@ def abrir_esqueleto():
         print("🚀  BOTÓN [26]: ESQUELETO INTEGRADOR OMNICANAL (BRECHAS WOO->ML & KIT CLIENTES NUEVOS)")
         print("=" * 96)
         print("  [1] 🔍 Detectar Brechas en Insumaes (Productos listos en Web que faltan en ML + Web sin foto)")
-        print("  [2] 📦 Generar Kit 'Llave en Mano' para Clientes Nuevos (.env.example + Plantilla Excel)")
+        print("  [2] 📦 Generar Kit 'Llave en Mano' para Clientes Nuevos (Con Columnas y Filas Auto-Ajustadas)")
         print("  [0] 🔙 Volver al Panel Principal")
         print("=" * 96)
         op = input("\n👉 Selecciona una opción (0-2): ").strip()
@@ -125,7 +123,15 @@ def abrir_esqueleto():
 
 if __name__ == "__main__":
     import sys
-    if "--init" in sys.argv:
+    if "--run" in sys.argv:
+        detectar_brechas_omnicanal()
         generar_kit_cliente_nuevo()
+        _, dbx, _ = conectar_todo()
+        for nom_x in ("CRM_MAESTRO_NACIONAL_INSUMAES.xlsx", "REPORTE_MAESTRO_COTIZACIONES_2026.xlsx"):
+            p_x = os.path.expanduser(f"~/{nom_x}")
+            if os.path.exists(p_x):
+                formateador_excel_cloud.estilizar_excel_pro(p_x)
+                dbx.files_upload(open(p_x, "rb").read(), f"/{nom_x}", mode=dropbox.files.WriteMode.overwrite)
+                print(f"✨ '{nom_x}' auto-ajustado en alto/ancho y actualizado en tu Dropbox.")
     else:
         abrir_esqueleto()
